@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj": {}
+    "d:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj": {}
   },
   "projects": {
-    "D:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj": {
+    "d:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj",
+        "projectUniqueName": "d:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj",
         "projectName": "WebAppApi",
-        "projectPath": "D:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj",
+        "projectPath": "d:\\react-supabase1\\server\\WebAppApi\\WebAppApi.csproj",
         "packagesPath": "C:\\Users\\kamil\\.nuget\\packages\\",
-        "outputPath": "D:\\react-supabase1\\server\\WebAppApi\\obj\\",
+        "outputPath": "d:\\react-supabase1\\server\\WebAppApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\kamil\\AppData\\Roaming\\NuGet\\NuGet.Config"
