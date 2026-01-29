@@ -46,18 +46,18 @@ app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
 
   console.log("Webhook event received:", event.type);
 
-  const updateUserPremium = (googleId, isPremium) => {
+  const updateUserPremium = (userId, isPremium) => {
     return new Promise((resolve, reject) => {
       db.query(
         "UPDATE users SET is_premium = ? WHERE google_id = ?",
-        [isPremium, googleId],
+        [isPremium, userId],
         (err, results) => {
           if (err) {
             console.error("❌ Błąd aktualizacji użytkownika:", err.message);
             return reject(err);
           }
           console.log(
-            `[Premium] ${googleId} → ${isPremium ? "premium" : "nie-premium"}`,
+            `[Premium] ${userId} → ${isPremium ? "premium" : "nie-premium"}`,
           );
           resolve(results);
         },
@@ -95,12 +95,12 @@ app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
 
         case "payment_intent.succeeded": {
           const paymentIntent = event.data.object;
-          const googleId = paymentIntent.metadata?.googleId;
-          if (!googleId) {
-            console.warn("Brak metadata.googleId w PaymentIntent.");
+          const userId = paymentIntent.metadata?.userId;
+          if (!userId) {
+            console.warn("Brak metadata.userId w PaymentIntent.");
             break;
           }
-          await updateUserPremium(googleId, true);
+          await updateUserPremium(userId, true);
           break;
         }
 
@@ -179,19 +179,19 @@ app.get("/config", (req, res) => {
 });
 
 app.post("/create-payment-intent", async (req, res) => {
-  const { googleId } = req.body;
+  const { userId } = req.body;
 
-  if (!googleId) {
-    return res.status(400).json({ error: "Brak googleId w żądaniu" });
+  if (!userId) {
+    return res.status(400).json({ error: "Brak userId w żądaniu" });
   }
 
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       currency: "pln",
-      amount: 1999,
+      amount: 3999,
       payment_method_types: ["card", "blik", "p24"],
       metadata: {
-        googleId,
+        userId,
       },
     });
     res.send({ clientSecret: paymentIntent.client_secret });

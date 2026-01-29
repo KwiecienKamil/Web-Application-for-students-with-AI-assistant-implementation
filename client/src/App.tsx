@@ -8,20 +8,12 @@ import Register from "./pages/Register/Register";
 import AuthCallback from "./features/auth/authCallback";
 import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
 import "./index.css";
+import Checkout from "./pages/Checkout/Checkout";
 
 function App() {
   useSupabaseAuth();
   const navigate = useNavigate();
   const session = useSelector((state: RootState) => state.auth.session);
-
-  useEffect(() => {
-    if (
-      session &&
-      !["/", "/auth/callback"].includes(window.location.pathname)
-    ) {
-      navigate("/");
-    }
-  }, [session, navigate]);
 
   return (
     <>
@@ -33,6 +25,7 @@ function App() {
           element={session ? <Navigate to="/" /> : <Register />}
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/platnosc" element={<Checkout />} />
       </Routes>
     </>
   );
