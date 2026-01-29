@@ -20,7 +20,7 @@ const Home = ({ session }: HomeProps) => {
 
   return (
     <div style={{ maxWidth: 420, margin: "40px auto", textAlign: "center" }}>
-      <h1>{`Witaj w aplikacji! ${name ? name : null}`}</h1>
+      <h1>{`Witaj w aplikacji! ${name ? name : ""}`}</h1>
       <button onClick={signOut} style={{ padding: "10px 20px", fontSize: 16 }}>
         Wyloguj się
       </button>

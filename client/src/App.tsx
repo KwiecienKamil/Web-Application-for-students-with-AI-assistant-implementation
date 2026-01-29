@@ -9,6 +9,7 @@ import AuthCallback from "./features/auth/authCallback";
 import { useSupabaseAuth } from "./hooks/useSupabaseAuth";
 import "./index.css";
 import Checkout from "./pages/Checkout/Checkout";
+import PaymentSuccess from "./features/billing/components/PaymentSuccess";
 
 function App() {
   useSupabaseAuth();
@@ -26,6 +27,7 @@ function App() {
         />
         <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="/platnosc" element={<Checkout />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
     </>
   );
