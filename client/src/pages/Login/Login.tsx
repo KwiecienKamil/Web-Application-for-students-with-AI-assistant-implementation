@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginWithEmail } from "../../features/auth/authSlice";
 import supabase from "../../utils/supabase";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
+
 const Login = () => {
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state) => state.auth);
+   const navigate = useNavigate();
+  const { loading, error, session } = useAppSelector((state) => state.auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -26,6 +28,12 @@ const Login = () => {
     e.preventDefault();
     dispatch(loginWithEmail({ email, password }));
   };
+
+  useEffect(() => {
+    if (session) {
+      navigate("/");
+    }
+  }, [session, navigate]);
 
   return (
     <UserAuthWrapper>

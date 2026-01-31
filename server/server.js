@@ -337,49 +337,71 @@ cron.schedule("0 5 * * *", () => {
           console.error(`Nie udało się wysłać maila do ${exam.email}:`, err);
         } else {
           console.log(`Przypomnienie wysłane do ${exam.email}`);
-        }
+        } 
       });
     });
   });
 });
 
 app.post("/save-user", (req, res) => {
-  const { googleId, email, name, picture, is_beta_tester } = req.body;
-  if (!googleId || !email || !validator.isEmail(email)) {
-    return res.status(400).send("Nieprawidłowe dane użytkownika");
+  const {
+    supabaseId,
+    email,
+    name,
+    picture,
+    is_beta_tester,
+  } = req.body;
+
+  if (!supabaseId || !email || !validator.isEmail(email)) {
+    return res.status(400).send("Invalid user data");
   }
 
+  const safeName = name ?? null;
+  const safePicture = picture ?? null;
   const isBetaTesterValue = is_beta_tester ? 1 : 0;
 
   db.query(
-    "SELECT * FROM users WHERE google_id = ?",
-    [googleId],
+    "SELECT id FROM users WHERE supabase_id = ?",
+    [supabaseId],
     (err, rows) => {
-      if (err) return res.status(500).send("Błąd serwera");
+      if (err) {
+        console.error(err);
+        return res.status(500).send("DB error");
+      }
 
       if (rows.length > 0) {
         db.query(
-          "UPDATE users SET name = ?, email = ?, picture = ?, isBetaTester = ? WHERE google_id = ?",
-          [name, email, picture, isBetaTesterValue, googleId],
+          `UPDATE users 
+           SET email = ?, name = ?, picture = ?, isBetaTester = ?
+           WHERE supabase_id = ?`,
+          [email, safeName, safePicture, isBetaTesterValue, supabaseId],
           (err) => {
-            if (err)
-              return res.status(500).send("Błąd serwera podczas aktualizacji");
-            res.status(200).send("Zapisano użytkownika");
-          },
+            if (err) {
+              console.error(err);
+              return res.status(500).send("Update error");
+            }
+            res.status(200).send("User updated");
+          }
         );
       } else {
         db.query(
-          "INSERT INTO users (google_id, email, name, picture, isBetaTester) VALUES (?, ?, ?, ?, ?)",
-          [googleId, email, name, picture, isBetaTesterValue],
+          `INSERT INTO users 
+           (supabase_id, email, name, picture, isBetaTester)
+           VALUES (?, ?, ?, ?, ?)`,
+          [supabaseId, email, safeName, safePicture, isBetaTesterValue],
           (err) => {
-            if (err) return res.status(500).send("Błąd serwera podczas zapisu");
-            res.status(200).send("Zapisano użytkownika");
-          },
+            if (err) {
+              console.error(err);
+              return res.status(500).send("Insert error");
+            }
+            res.status(201).send("User created");
+          }
         );
       }
-    },
+    }
   );
 });
+
 
 app.post("/exams", (req, res) => {
   const { user_id, subject, date, term, note } = req.body;

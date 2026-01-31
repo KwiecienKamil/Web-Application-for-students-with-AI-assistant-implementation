@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import type { RootState } from "./store";
@@ -13,7 +12,6 @@ import PaymentSuccess from "./features/billing/components/PaymentSuccess";
 
 function App() {
   useSupabaseAuth();
-  const navigate = useNavigate();
   const session = useSelector((state: RootState) => state.auth.session);
 
   return (

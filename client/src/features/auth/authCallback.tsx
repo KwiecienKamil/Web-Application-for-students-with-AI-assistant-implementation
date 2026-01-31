@@ -1,28 +1,52 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../../store/hooks";
+import { setSession } from "../../features/auth/authSlice";
 import supabase from "../../utils/supabase";
 
-const authCallback = () => {
+const AuthCallback = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (data.session) {
-        const user = data.session.user;
+    const handleCallback = async () => {
+      const { data, error } = await supabase.auth.getSession();
 
-        await supabase.from("users").upsert({
-          id: user.id,
-          email: user.email,
-        });
-
-        navigate("/");
-      } else {
+      if (error || !data.session) {
         navigate("/login");
+        return;
       }
-    });
-  }, []);
+
+      const session = data.session;
+      const user = session.user;
+
+      dispatch(setSession(session));
+
+      await fetch(`${import.meta.env.VITE_SERVER_URL}/save-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          supabaseId: user.id,
+          email: user.email,
+          name:
+            user.user_metadata?.full_name ||
+            user.user_metadata?.name ||
+            null,
+          picture: user.user_metadata?.avatar_url || null,
+          is_beta_tester: false,
+        }),
+      });
+
+      navigate("/");
+    };
+
+    handleCallback();
+  }, [dispatch, navigate]);
 
   return <p>Potwierdzanie konta...</p>;
 };
 
-export default authCallback;
+export default AuthCallback;

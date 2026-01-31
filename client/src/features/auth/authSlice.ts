@@ -16,6 +16,29 @@ const initialState: AuthState = {
   registrationSuccess: false,
 };
 
+const saveUserToBackend = async (session: Session) => {
+  const user = session.user;
+
+  await fetch(`${import.meta.env.VITE_SERVER_URL}/save-user`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({
+      supabaseId: user.id,
+      email: user.email,
+      name:
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        null,
+      picture: user.user_metadata?.avatar_url || null,
+      is_beta_tester: false,
+    }),
+  });
+};
+
+
 export const loginWithEmail = createAsyncThunk(
   "auth/loginWithEmail",
   async (
@@ -28,6 +51,10 @@ export const loginWithEmail = createAsyncThunk(
     });
 
     if (error) return thunkAPI.rejectWithValue(error.message);
+
+    if (data.session) {
+      await saveUserToBackend(data.session);
+    }
     return data.session;
   }
 );
