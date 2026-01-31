@@ -26,7 +26,6 @@ const saveUserToBackend = async (session: Session) => {
       Authorization: `Bearer ${session.access_token}`,
     },
     body: JSON.stringify({
-      supabaseId: user.id,
       email: user.email,
       name:
         user.user_metadata?.full_name ||

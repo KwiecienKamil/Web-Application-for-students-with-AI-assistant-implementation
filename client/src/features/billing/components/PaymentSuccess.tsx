@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface PaymentSuccessParams {
   payment_intent: string | null;
@@ -40,6 +40,7 @@ const PaymentSuccess: React.FC = () => {
       </p>
 
       <p>Dziękujemy za skorzystanie z naszego serwisu!</p>
+      <Link to="/">Wróć do aplikacji</Link>
     </main>
   );
 };

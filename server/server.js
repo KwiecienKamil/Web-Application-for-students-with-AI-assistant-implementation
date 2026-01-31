@@ -9,6 +9,7 @@ const app = express();
 const validator = require("validator");
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const { OpenAI } = require("openai");
+const supabase = require("./lib/supabaseClient");
 
 const db = mysql.createPool({
   connectionLimit: 10,
@@ -32,133 +33,45 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2022-08-01",
 });
 
-app.post("/webhook", express.raw({ type: "application/json" }), (req, res) => {
-  console.log("Webhook received:", req.body);
+app.post("/webhook", express.raw({ type: "application/json" }), async (req, res) => {
   const sig = req.headers["stripe-signature"];
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
   } catch (err) {
-    console.error("Błąd weryfikacji podpisu webhooka:", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    return res.status(400).send("Webhook error");
   }
 
-  console.log("Webhook event received:", event.type);
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+    const userId = paymentIntent.metadata.userId;
 
-  const updateUserPremium = (userId, isPremium) => {
-    return new Promise((resolve, reject) => {
-      db.query(
-        "UPDATE users SET is_premium = ? WHERE google_id = ?",
-        [isPremium, userId],
-        (err, results) => {
-          if (err) {
-            console.error("❌ Błąd aktualizacji użytkownika:", err.message);
-            return reject(err);
-          }
-          console.log(
-            `[Premium] ${userId} → ${isPremium ? "premium" : "nie-premium"}`,
-          );
-          resolve(results);
-        },
+    const [rows] = await db.promise().query(
+      "SELECT id FROM payments WHERE stripe_pi_id = ?",
+      [paymentIntent.id]
+    );
+
+    if (rows.length === 0) {
+      await db.promise().query(
+        "INSERT INTO payments (stripe_pi_id, user_id, amount) VALUES (?, ?, ?)",
+        [paymentIntent.id, userId, paymentIntent.amount]
       );
-    });
-  };
 
-  const allowedEvents = [
-    "checkout.session.completed",
-    "payment_intent.succeeded",
-    "customer.subscription.updated",
-    "customer.subscription.deleted",
-    "invoice.payment_succeeded",
-    "invoice.payment_failed",
-  ];
-
-  if (!allowedEvents.includes(event.type)) {
-    console.log(`ℹNieobsługiwany event: ${event.type}`);
-    return res.status(200).send("Event zignorowany");
+      await db.promise().query(
+        "UPDATE users SET is_premium = 1 WHERE supabase_id = ?",
+        [userId]
+      );
+    }
   }
 
-  (async () => {
-    try {
-      switch (event.type) {
-        case "checkout.session.completed": {
-          const session = event.data.object;
-          const googleId = session.client_reference_id;
-          if (!googleId) {
-            console.warn("Brak client_reference_id w sesji Stripe.");
-            break;
-          }
-          await updateUserPremium(googleId, true);
-          break;
-        }
-
-        case "payment_intent.succeeded": {
-          const paymentIntent = event.data.object;
-          const userId = paymentIntent.metadata?.userId;
-          if (!userId) {
-            console.warn("Brak metadata.userId w PaymentIntent.");
-            break;
-          }
-          await updateUserPremium(userId, true);
-          break;
-        }
-
-        case "customer.subscription.updated": {
-          const subscription = event.data.object;
-          const googleId = subscription.metadata?.googleId;
-          if (!googleId) {
-            console.warn("Brak metadata.googleId w subskrypcji.");
-            break;
-          }
-          const isActive = subscription.status === "active";
-          await updateUserPremium(googleId, isActive);
-          break;
-        }
-
-        case "customer.subscription.deleted": {
-          const subscription = event.data.object;
-          const googleId = subscription.metadata?.googleId;
-          if (!googleId) {
-            console.warn("Brak metadata.googleId w subskrypcji (usunięcie).");
-            break;
-          }
-          await updateUserPremium(googleId, false);
-          break;
-        }
-
-        case "invoice.payment_succeeded": {
-          const invoice = event.data.object;
-          const googleId = invoice.metadata?.googleId;
-          if (googleId) {
-            await updateUserPremium(googleId, true);
-          } else {
-            console.warn("invoice.payment_succeeded bez metadata.googleId");
-          }
-          break;
-        }
-
-        case "invoice.payment_failed": {
-          const invoice = event.data.object;
-          const googleId = invoice.metadata?.googleId;
-          if (googleId) {
-            console.warn(`Płatność nieudana dla użytkownika: ${googleId}`);
-          } else {
-            console.warn("invoice.payment_failed bez metadata.googleId");
-          }
-          break;
-        }
-
-        default:
-          console.log(`Nieobsługiwany typ eventu: ${event.type}`);
-      }
-    } catch (e) {
-      console.error("Błąd w obsłudze webhooka:", e);
-    } finally {
-      res.status(200).send("Webhook received");
-    }
-  })();
+  res.json({ received: true });
 });
+
 
 app.use(bodyParser.json());
 
@@ -201,65 +114,6 @@ app.post("/create-payment-intent", async (req, res) => {
         message: error.message,
       },
     });
-  }
-});
-
-app.post("/create-subscription-session", async (req, res) => {
-  const { customerEmail, googleId } = req.body;
-
-  try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription",
-      customer_email: customerEmail,
-      client_reference_id: googleId,
-      line_items: [
-        {
-          price: process.env.STRIPE_PRICE_ID,
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.FRONTEND_URL}/premium-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/premium-cancelled`,
-    });
-
-    res.json({ url: session.url });
-  } catch (error) {
-    console.error("Błąd tworzenia sesji Stripe:", error.message);
-    res.status(500).json({ error: "Nie udało się utworzyć sesji płatności" });
-  }
-});
-
-app.get("/check-subscription/:sessionId", async (req, res) => {
-  try {
-    const session = await stripe.checkout.sessions.retrieve(
-      req.params.sessionId,
-    );
-    if (session.payment_status === "paid") {
-      const googleId = session.client_reference_id;
-      if (!googleId) {
-        return res
-          .status(400)
-          .json({ error: "Brak client_reference_id w sesji" });
-      }
-
-      db.query(
-        "UPDATE users SET is_premium = 1 WHERE google_id = ?",
-        [googleId],
-        (err) => {
-          if (err) {
-            console.error("Błąd aktualizacji premium:", err);
-            return res.status(500).json({ error: "Błąd aktualizacji bazy" });
-          }
-          return res.json({ success: true });
-        },
-      );
-    } else {
-      return res.json({ success: false });
-    }
-  } catch (err) {
-    console.error("Błąd sprawdzania subskrypcji:", err.message);
-    return res.status(500).json({ error: "Błąd sprawdzania płatności" });
   }
 });
 
@@ -343,16 +197,38 @@ cron.schedule("0 5 * * *", () => {
   });
 });
 
-app.post("/save-user", (req, res) => {
-  const {
-    supabaseId,
-    email,
-    name,
-    picture,
-    is_beta_tester,
-  } = req.body;
+const requireAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
 
-  if (!supabaseId || !email || !validator.isEmail(email)) {
+    if (!authHeader?.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Missing auth token" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error || !data?.user) {
+      console.error("Supabase auth error:", error);
+      return res.status(401).json({ error: "Invalid or expired token" });
+    }
+
+    req.user = data.user;
+    next();
+  } catch (err) {
+    console.error("Auth middleware crash:", err);
+    return res.status(500).json({ error: "Auth middleware error" });
+  }
+};
+
+
+
+app.post("/save-user", requireAuth, (req, res) => {
+  const { email, name, picture, is_beta_tester } = req.body;
+  const supabaseId = req.user.id;
+
+  if (!email || !validator.isEmail(email)) {
     return res.status(400).send("Invalid user data");
   }
 
@@ -364,10 +240,7 @@ app.post("/save-user", (req, res) => {
     "SELECT id FROM users WHERE supabase_id = ?",
     [supabaseId],
     (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).send("DB error");
-      }
+      if (err) return res.status(500).send("DB error");
 
       if (rows.length > 0) {
         db.query(
@@ -375,13 +248,7 @@ app.post("/save-user", (req, res) => {
            SET email = ?, name = ?, picture = ?, isBetaTester = ?
            WHERE supabase_id = ?`,
           [email, safeName, safePicture, isBetaTesterValue, supabaseId],
-          (err) => {
-            if (err) {
-              console.error(err);
-              return res.status(500).send("Update error");
-            }
-            res.status(200).send("User updated");
-          }
+          () => res.status(200).send("User updated")
         );
       } else {
         db.query(
@@ -389,18 +256,13 @@ app.post("/save-user", (req, res) => {
            (supabase_id, email, name, picture, isBetaTester)
            VALUES (?, ?, ?, ?, ?)`,
           [supabaseId, email, safeName, safePicture, isBetaTesterValue],
-          (err) => {
-            if (err) {
-              console.error(err);
-              return res.status(500).send("Insert error");
-            }
-            res.status(201).send("User created");
-          }
+          () => res.status(201).send("User created")
         );
       }
     }
   );
 });
+
 
 
 app.post("/exams", (req, res) => {
