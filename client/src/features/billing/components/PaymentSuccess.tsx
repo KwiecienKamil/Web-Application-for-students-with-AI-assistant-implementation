@@ -30,7 +30,7 @@ const PaymentSuccess: React.FC = () => {
 
   return (
     <main style={{ padding: "2rem", textAlign: "center" }}>
-      <h1>Płatność zakończona sukcesem 🎉</h1>
+      <h1>Płatność zakończona sukcesem</h1>
 
       <p>
         <strong>ID płatności:</strong> {payment_intent}
