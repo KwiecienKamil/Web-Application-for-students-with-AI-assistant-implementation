@@ -5,6 +5,7 @@ import supabase from "../../utils/supabase";
 import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
+import { Button } from "../../components/Button/Button";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -65,9 +66,9 @@ const Login = () => {
             style={{ display: "block", width: "100%", marginBottom: 10 }}
           />
 
-          <button type="submit" disabled={loading} style={{ padding: 10 }}>
-            {loading ? "Logowanie..." : "Zaloguj"}
-          </button>
+          <Button type="submit" variant="secondary" isLoading={loading}>
+          Zaloguj
+        </Button>
 
           {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
         </form>
