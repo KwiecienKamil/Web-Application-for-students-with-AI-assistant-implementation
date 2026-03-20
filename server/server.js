@@ -57,10 +57,12 @@ app.post("/webhook", express.raw({ type: "application/json" }), async (req, res)
     );
 
     if (rows.length === 0) {
-      await db.promise().query(
-        "INSERT INTO payments (stripe_pi_id, user_id, amount) VALUES (?, ?, ?)",
-        [paymentIntent.id, userId, paymentIntent.amount]
-      );
+        await db.promise().query(
+          `INSERT INTO payments (stripe_pi_id, user_id, amount, status)
+           VALUES (?, ?, ?, ?)`,
+          [paymentIntent.id, userId, paymentIntent.amount, paymentIntent.status || 'unknown']
+        );
+        console.log("✅ Payment saved to DB:", paymentIntent.id);
 
       await db.promise().query(
         "UPDATE users SET is_premium = 1 WHERE supabase_id = ?",
