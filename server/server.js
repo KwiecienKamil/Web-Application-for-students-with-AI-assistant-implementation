@@ -57,10 +57,11 @@ app.post("/webhook", express.raw({ type: "application/json" }), async (req, res)
     );
 
     if (rows.length === 0) {
-      await db.promise().query(
-        "INSERT INTO payments (stripe_pi_id, user_id, amount) VALUES (?, ?, ?)",
-        [paymentIntent.id, userId, paymentIntent.amount]
-      );
+        await db.promise().query(
+          `INSERT INTO payments (stripe_pi_id, user_id, amount, status)
+           VALUES (?, ?, ?, ?)`,
+          [paymentIntent.id, userId, paymentIntent.amount, paymentIntent.status || 'unknown']
+        );
 
       await db.promise().query(
         "UPDATE users SET is_premium = 1 WHERE supabase_id = ?",
@@ -259,6 +260,50 @@ app.post("/save-user", requireAuth, (req, res) => {
           () => res.status(201).send("User created")
         );
       }
+    }
+  );
+});
+
+app.get("/getUser", requireAuth, (req, res) => {
+  const supabaseId = req.user.id;
+
+  db.query(
+    `SELECT 
+      id,
+      name,
+      email,
+      picture,
+      supabase_id,
+      is_premium,
+      terms_accepted,
+      isBetaTester,
+      isProfilePublic
+     FROM users
+     WHERE supabase_id = ?`,
+    [supabaseId],
+    (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "DB error" });
+      }
+
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const user = rows[0];
+
+      res.json({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        picture: user.picture,
+        supabaseId: user.supabase_id,
+        isPremium: !!user.is_premium,
+        termsAccepted: !!user.terms_accepted,
+        isBetaTester: !!user.isBetaTester,
+        isProfilePublic: !!user.isProfilePublic,
+      });
     }
   );
 });
