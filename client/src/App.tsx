@@ -13,11 +13,10 @@ import PaymentSuccess from "./features/billing/components/PaymentSuccess";
 function App() {
   useSupabaseAuth();
   const session = useSelector((state: RootState) => state.auth.session);
-
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home session={session}/>} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/register"

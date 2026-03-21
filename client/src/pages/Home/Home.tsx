@@ -3,13 +3,18 @@ import supabase from "../../utils/supabase";
 import { useEffect } from "react";
 import { fetchUser } from "../../features/auth/userSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import type { Session } from "@supabase/supabase-js";
+import InterfaceWrapper from "../../components/InterfaceWrapper/InterfaceWrapper";
+import Sidebar from "../../components/Sidebar/Sidebar";
 
+type HomeProps = {
+  session: Session | null;
+};
 
-
-const Home = () => {
+const Home = ({session} : HomeProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector((user) => user.user.user)
+  const user = useAppSelector((user) => user.user.user);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -17,17 +22,15 @@ const Home = () => {
   };
 
   useEffect(() => {
+  if (session && !user) {
     dispatch(fetchUser());
-  }, []);
+  }
+}, [session, user, dispatch]);
 
   return (
-    <div >
-      <h1>{`Witaj w aplikacji! ${user ? user.name : ""}`}</h1>
-      <button onClick={signOut}>
-        Wyloguj się
-      </button>
-      <Link to="/platnosc">Platnosc</Link>
-    </div>
+    <InterfaceWrapper>
+      <Sidebar user={user}/>
+    </InterfaceWrapper>
   );
 };
 

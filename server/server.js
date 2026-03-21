@@ -224,7 +224,6 @@ const requireAuth = async (req, res, next) => {
 };
 
 
-
 app.post("/save-user", requireAuth, (req, res) => {
   const { email, name, picture, is_beta_tester } = req.body;
   const supabaseId = req.user.id;
@@ -292,7 +291,6 @@ app.get("/getUser", requireAuth, (req, res) => {
       }
 
       const user = rows[0];
-
       res.json({
         id: user.id,
         name: user.name,
@@ -307,8 +305,6 @@ app.get("/getUser", requireAuth, (req, res) => {
     }
   );
 });
-
-
 
 app.post("/exams", (req, res) => {
   const { user_id, subject, date, term, note } = req.body;

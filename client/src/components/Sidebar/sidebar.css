@@ -1,0 +1,32 @@
+#sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    max-width: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    background: var(--accent);
+    color: white;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+#sidebar-wrapper.open {
+  transform: translateX(0);
+}
+
+#sidebar-menu-button{
+    color: var(--accent);
+    font-size: 1.5rem;
+}
+
+.sidebar-user-image {
+    max-width: 60px;
+    border-radius: 100%;
+}
+
+#sidebar-logo {
+    max-width: 50%;
+}

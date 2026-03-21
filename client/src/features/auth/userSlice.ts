@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-type User = {
+export type User = {
   id: string;
   email: string;
   name: string | null;
