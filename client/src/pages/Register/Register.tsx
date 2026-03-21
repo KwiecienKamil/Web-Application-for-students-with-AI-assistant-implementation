@@ -3,6 +3,10 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { registerWithEmail } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
+import { Button } from "../../components/Button/Button";
+import logo from "../../assets/logo-ot.png"
+import supabase from "../../utils/supabase";
+import { FaGoogle } from "react-icons/fa";
 
 const Register = () => {
   const dispatch = useAppDispatch();
@@ -32,10 +36,24 @@ const Register = () => {
     );
   }
 
+   const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) alert("Błąd logowania: " + error.message);
+  };
+
   return (
     <UserAuthWrapper>
       <div className="auth-form">
-        <h2>Rejestracja</h2>
+       <div className="auth-title">
+        <img src={logo} alt="Ogarnijto.org" />
+        <h2>Witamy!</h2>
+        </div>
         <form onSubmit={handleRegister}>
           <input
             type="email"
@@ -53,12 +71,24 @@ const Register = () => {
             required
           />
 
-          <button type="submit" disabled={loading}>
+          <Button type="submit" variant="primary" size="lg" disabled={loading}>
             {loading ? "Rejestracja..." : "Zarejestruj się"}
-          </button>
-          <Link to="/login">Masz już konto?</Link>
+          </Button>
+          </form>
+          <div className="auth-external-services">
+                    <p>Lub</p>
+                    <Button
+                    variant="secondary"
+                    size="lg"
+                    onClick={signInWithGoogle}
+                  >
+                    <FaGoogle className="auth-google-icon"/> Zaloguj przez Google
+                  </Button>
+                  </div>
+            <div>
+              Masz już konto? <Link to="/login">Zaloguj się</Link>
+            </div>
           {error && <p style={{ color: "red" }}>{error}</p>}
-        </form>
       </div>
     </UserAuthWrapper>
   );

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import "./user-login-wrapper.css";
+import "./user-auth-wrapper.css";
 
 type UserAuthWrapperProps = {
   children: ReactNode;

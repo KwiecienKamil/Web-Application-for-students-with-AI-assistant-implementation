@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
 import { Button } from "../../components/Button/Button";
+import logo from "../../assets/logo-ot.png"
+import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -39,39 +41,42 @@ const Login = () => {
   return (
     <UserAuthWrapper>
       <div className="auth-form">
-        <h2>Logowanie</h2>
-        <button
-          onClick={signInWithGoogle}
-          style={{ padding: 10, marginBottom: 20 }}
-        >
-          Zaloguj przez Google
-        </button>
+        <div className="auth-title">
+        <img src={logo} alt="Ogarnijto.org" />
+        <h2>Witamy!</h2>
+        </div>
         <hr />
-        <form onSubmit={handleEmailLogin} style={{ marginTop: 20 }}>
+        <form onSubmit={handleEmailLogin}>
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ display: "block", width: "100%", marginBottom: 10 }}
           />
-
           <input
             type="password"
             placeholder="Hasło"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ display: "block", width: "100%", marginBottom: 10 }}
           />
 
-          <Button type="submit" variant="secondary" isLoading={loading}>
+          <Button type="submit" variant="primary" size="lg" isLoading={loading}>
           Zaloguj
         </Button>
-
-          {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+          {error && <p>{error}</p>}
         </form>
+        <div className="auth-external-services">
+          <p>Lub</p>
+          <Button
+          variant="secondary"
+          size="lg"
+          onClick={signInWithGoogle}
+        >
+          <FaGoogle className="auth-google-icon"/> Zaloguj przez Google
+        </Button>
+        </div>
         <div>
           Nie masz konta? <Link to="/register">Zarejestruj się</Link>
         </div>

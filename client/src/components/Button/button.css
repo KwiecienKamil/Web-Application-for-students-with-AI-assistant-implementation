@@ -4,6 +4,10 @@
   border-radius: 8px;
   font-weight: 500;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: .5rem 0 .5rem 0;
 }
 
 .btn--primary {
