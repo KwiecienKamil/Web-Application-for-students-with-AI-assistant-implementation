@@ -306,36 +306,36 @@ app.get("/getUser", requireAuth, (req, res) => {
   );
 });
 
-app.post("/exams", (req, res) => {
-  const { user_id, subject, date, term, note } = req.body;
+app.get("/exams", requireAuth, (req, res) => {
+  const supabaseId = req.user.id;
 
-  if (!user_id || !subject || !date || !term) {
-    return res.status(400).json({ error: "Brak wymaganych danych" });
-  }
+  db.query(
+    "SELECT id FROM users WHERE supabase_id = ?",
+    [supabaseId],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: "DB error" });
+      }
 
-  const query =
-    "INSERT INTO exams (user_id, subject, date, term, note) VALUES (?, ?, ?, ?, ?)";
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-  db.query(query, [user_id, subject, date, term, note || ""], (err, result) => {
-    if (err) {
-      console.error("Błąd przy zapisie egzaminu:", err);
-      return res.status(500).json({ error: "Błąd zapisu egzaminu" });
+      const userId = rows[0].id;
+
+      db.query(
+        "SELECT * FROM exams WHERE user_id = ?",
+        [userId],
+        (err, exams) => {
+          if (err) {
+            return res.status(500).json({ error: "DB error exams" });
+          }
+
+          res.json(exams);
+        }
+      );
     }
-
-    if (result.affectedRows === 1) {
-      const insertedExam = {
-        id: result.insertId,
-        user_id,
-        subject,
-        date,
-        term,
-        note: note || "",
-      };
-      return res.status(201).json(insertedExam);
-    } else {
-      return res.status(500).json({ error: "Nie udało się zapisać egzaminu" });
-    }
-  });
+  );
 });
 
 app.get("/exams/:user_id", (req, res) => {

@@ -1,0 +1,5 @@
+#exams-section-wrapper {
+    flex: 1;
+    background: var(--light);
+    border-radius: .5rem;
+}

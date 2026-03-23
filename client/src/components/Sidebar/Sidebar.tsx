@@ -1,11 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom'
 import supabase from '../../utils/supabase';
 import type { User } from '../../features/auth/userSlice';
-import { useEffect, useRef, useState } from 'react';
+import {  useState } from 'react';
 import { FiMenu } from "react-icons/fi";
 import "./sidebar.css"
 import defaultUserImage from "../../assets/defaultUserImage.png"
 import logo from "../../assets/logo_OT_t.png"
+import { RiArrowLeftBoxFill } from "react-icons/ri";
 
 type SidebarProps = {
     user: User | null;
@@ -13,7 +14,6 @@ type SidebarProps = {
 
 const Sidebar = ({user}: SidebarProps) => {
     const navigate = useNavigate();
-    const sidebarRef = useRef<HTMLDivElement | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     
     const signOut = async () => {
@@ -21,41 +21,48 @@ const Sidebar = ({user}: SidebarProps) => {
         navigate("/login");
       };
 
-    useEffect(() => {
-        if (!sidebarRef.current) return;
-
-        if (isOpen) {
-            sidebarRef.current.classList.add("open");
-        } else {
-            sidebarRef.current.classList.remove("open");
-        }
-    }, [isOpen]);
-
-
   return (
     <>
-        <FiMenu
-        id="sidebar-menu-button"
-          onClick={() => setIsOpen(!isOpen)}
+    <div id="sidebar-menu-button">
+      <FiMenu
+          onClick={() => setIsOpen(prev => !prev)}
         />
+    </div>
     <div 
     id="sidebar-wrapper"
-    ref={sidebarRef}
+    className={isOpen ? "open" : ""}
     >
+      <RiArrowLeftBoxFill
+        id="sidebar-menu-close-button"
+          onClick={() => setIsOpen(prev => !prev)}
+        />
     <img src={logo} 
     id="sidebar-logo"
     alt="Ogarnijto.org logo" />
-    <div id="sidebar-user-info">
+    <div>
+      <div id="sidebar-user-info">
         <img 
         src={user?.picture ? user.picture : defaultUserImage} 
         className="sidebar-user-image"
-        alt="Zdjęcie użytkownika" />
+        alt="Zdjęcie użytkownika" 
+        referrerPolicy="no-referrer"
+        />
         <h1>{`Cześć ${user ? user.name : ""}!`}</h1>
     </div>
+     <nav>
+  <ul>
+    <li>
+      <Link to="/platnosc">Płatność</Link>
+    </li>
+
+    <li>
       <button onClick={signOut}>
         Wyloguj się
       </button>
-      <Link to="/platnosc">Platnosc</Link>
+    </li>
+  </ul>
+</nav>
+    </div>
     </div>
     </>
   )
