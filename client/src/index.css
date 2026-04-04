@@ -1,18 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Edu+SA+Hand:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Edu+SA+Hand:wght@400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 :root {
-  --light: #f5f5f5;
-  --accent: #111827;
-  --gradient1: #064772;
-  --gradient2: #0f52ba;
-  --success: #1aaa1a;
-  --font-main: "Edu SA Hand";
-  --font-second: "Inter";
+	--light: #f5f5f5;
+	--accent: #111827;
+	--gradient1: #064772;
+	--gradient2: #0f52ba;
+	--success: #1aaa1a;
+	--font-main: "Edu SA Hand";
+	--font-second: "Inter";
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: var(--font-second);
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: var(--font-second);
 }
-

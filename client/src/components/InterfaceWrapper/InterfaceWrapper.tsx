@@ -1,16 +1,12 @@
-import type { ReactNode } from "react"
-import "./interface-wrapper.css"
+import type { ReactNode } from "react";
+import "./interface-wrapper.css";
 
 type WrapperProps = {
-  children: ReactNode;
+	children: ReactNode;
 };
 
-const InterfaceWrapper = ({children}: WrapperProps) => {
-  return (
-    <div id="interface-wrapper">
-        {children}
-    </div>
-  )
-}
+const InterfaceWrapper = ({ children }: WrapperProps) => {
+	return <div id="interface-wrapper">{children}</div>;
+};
 
-export default InterfaceWrapper
+export default InterfaceWrapper;

@@ -2,11 +2,11 @@ import type { ReactNode } from "react";
 import "./user-auth-wrapper.css";
 
 type UserAuthWrapperProps = {
-  children: ReactNode;
+	children: ReactNode;
 };
 
 const UserAuthWrapper = ({ children }: UserAuthWrapperProps) => {
-  return <div id="user-auth-wrapper">{children}</div>;
+	return <div id="user-auth-wrapper">{children}</div>;
 };
 
 export default UserAuthWrapper;

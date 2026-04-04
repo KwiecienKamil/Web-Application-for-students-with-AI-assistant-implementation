@@ -4,11 +4,11 @@ import userReducer from "../features/auth/userSlice";
 import examReducer from "../features/exams/ExamSlice";
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    user: userReducer,
-    exams: examReducer,
-  },
+	reducer: {
+		auth: authReducer,
+		user: userReducer,
+		exams: examReducer,
+	},
 });
 
 export type RootState = ReturnType<typeof store.getState>;

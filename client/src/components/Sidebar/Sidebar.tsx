@@ -21,6 +21,14 @@ const Sidebar = ({user}: SidebarProps) => {
         navigate("/login");
       };
 
+
+
+      
+    
+    // Some users have their full name, pick only first name 
+    const displayOnlyFirstName = user?.name?.split(" ")[0]
+
+
   return (
     <>
     <div id="sidebar-menu-button">
@@ -47,14 +55,13 @@ const Sidebar = ({user}: SidebarProps) => {
         alt="Zdjęcie użytkownika" 
         referrerPolicy="no-referrer"
         />
-        <h1>{`Cześć ${user ? user.name : ""}!`}</h1>
+        <h1>{`Cześć ${user ? displayOnlyFirstName : ""}!`}</h1>
     </div>
      <nav>
   <ul>
     <li>
       <Link to="/platnosc">Płatność</Link>
     </li>
-
     <li>
       <button onClick={signOut}>
         Wyloguj się
