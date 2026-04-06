@@ -31,9 +31,6 @@ const Home = ({ session }: HomeProps) => {
 		<InterfaceWrapper>
 			<Sidebar user={user} />
 			<section id="exams-section-wrapper"></section>
-
-
-			
 		</InterfaceWrapper>
 	);
 };

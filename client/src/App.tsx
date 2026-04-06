@@ -23,7 +23,6 @@ function App() {
 					element={session ? <Navigate to="/" /> : <Register />}
 				/>
 
-				
 				<Route path="/auth/callback" element={<AuthCallback />} />
 				<Route path="/platnosc" element={<Checkout />} />
 				<Route path="/payment-success" element={<PaymentSuccess />} />
