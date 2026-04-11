@@ -4,4 +4,5 @@
 	display: flex;
 	background: var(--accent);
 	padding: 1rem;
+	overflow: hidden;
 }
