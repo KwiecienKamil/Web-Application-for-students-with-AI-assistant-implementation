@@ -33,46 +33,56 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2022-08-01",
 });
 
-app.post("/webhook", express.raw({ type: "application/json" }), async (req, res) => {
-  const sig = req.headers["stripe-signature"];
-  let event;
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    let event;
 
-  try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    );
-  } catch (err) {
-    return res.status(400).send("Webhook error");
-  }
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET,
+      );
+    } catch (err) {
+      return res.status(400).send("Webhook error");
+    }
 
-  if (event.type === "payment_intent.succeeded") {
-    const paymentIntent = event.data.object;
-    const userId = paymentIntent.metadata.userId;
+    if (event.type === "payment_intent.succeeded") {
+      const paymentIntent = event.data.object;
+      const userId = paymentIntent.metadata.userId;
 
-    const [rows] = await db.promise().query(
-      "SELECT id FROM payments WHERE stripe_pi_id = ?",
-      [paymentIntent.id]
-    );
+      const [rows] = await db
+        .promise()
+        .query("SELECT id FROM payments WHERE stripe_pi_id = ?", [
+          paymentIntent.id,
+        ]);
 
-    if (rows.length === 0) {
+      if (rows.length === 0) {
         await db.promise().query(
           `INSERT INTO payments (stripe_pi_id, user_id, amount, status)
            VALUES (?, ?, ?, ?)`,
-          [paymentIntent.id, userId, paymentIntent.amount, paymentIntent.status || 'unknown']
+          [
+            paymentIntent.id,
+            userId,
+            paymentIntent.amount,
+            paymentIntent.status || "unknown",
+          ],
         );
 
-      await db.promise().query(
-        "UPDATE users SET is_premium = 1 WHERE supabase_id = ?",
-        [userId]
-      );
+        await db
+          .promise()
+          .query("UPDATE users SET is_premium = 1 WHERE supabase_id = ?", [
+            userId,
+          ]);
+      }
     }
-  }
 
-  res.json({ received: true });
-});
-
+    res.json({ received: true });
+  },
+);
 
 app.use(bodyParser.json());
 
@@ -192,7 +202,7 @@ cron.schedule("0 5 * * *", () => {
           console.error(`Nie udało się wysłać maila do ${exam.email}:`, err);
         } else {
           console.log(`Przypomnienie wysłane do ${exam.email}`);
-        } 
+        }
       });
     });
   });
@@ -214,7 +224,6 @@ const requireAuth = async (req, res, next) => {
       console.error("Supabase auth error:", error);
       return res.status(401).json({ error: "Invalid or expired token" });
     }
-
     req.user = data.user;
     next();
   } catch (err) {
@@ -222,7 +231,6 @@ const requireAuth = async (req, res, next) => {
     return res.status(500).json({ error: "Auth middleware error" });
   }
 };
-
 
 app.post("/save-user", requireAuth, (req, res) => {
   const { email, name, picture, is_beta_tester } = req.body;
@@ -248,7 +256,7 @@ app.post("/save-user", requireAuth, (req, res) => {
            SET email = ?, name = ?, picture = ?, isBetaTester = ?
            WHERE supabase_id = ?`,
           [email, safeName, safePicture, isBetaTesterValue, supabaseId],
-          () => res.status(200).send("User updated")
+          () => res.status(200).send("User updated"),
         );
       } else {
         db.query(
@@ -256,10 +264,10 @@ app.post("/save-user", requireAuth, (req, res) => {
            (supabase_id, email, name, picture, isBetaTester)
            VALUES (?, ?, ?, ?, ?)`,
           [supabaseId, email, safeName, safePicture, isBetaTesterValue],
-          () => res.status(201).send("User created")
+          () => res.status(201).send("User created"),
         );
       }
-    }
+    },
   );
 });
 
@@ -302,7 +310,7 @@ app.get("/getUser", requireAuth, (req, res) => {
         isBetaTester: !!user.isBetaTester,
         isProfilePublic: !!user.isProfilePublic,
       });
-    }
+    },
   );
 });
 
@@ -310,31 +318,18 @@ app.get("/exams", requireAuth, (req, res) => {
   const supabaseId = req.user.id;
 
   db.query(
-    "SELECT id FROM users WHERE supabase_id = ?",
+    `SELECT exams.* 
+   FROM exams
+   JOIN users ON exams.user_id = users.supabase_id
+   WHERE users.supabase_id = ?`,
     [supabaseId],
-    (err, rows) => {
+    (err, exams) => {
       if (err) {
-        return res.status(500).json({ error: "DB error" });
+        return res.status(500).json({ error: "DB error exams" });
       }
 
-      if (rows.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      const userId = rows[0].id;
-
-      db.query(
-        "SELECT * FROM exams WHERE user_id = ?",
-        [userId],
-        (err, exams) => {
-          if (err) {
-            return res.status(500).json({ error: "DB error exams" });
-          }
-
-          res.json(exams);
-        }
-      );
-    }
+      res.json(exams);
+    },
   );
 });
 
