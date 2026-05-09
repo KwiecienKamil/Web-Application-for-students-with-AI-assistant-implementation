@@ -7,6 +7,8 @@ import "./sidebar.css";
 import defaultUserImage from "../../assets/defaultUserImage.png";
 import logo from "../../assets/logo_OT_t.png";
 import { RiArrowLeftBoxFill } from "react-icons/ri";
+import { navLinks } from "../../utils/Helpers";
+import { BiLogOutCircle } from "react-icons/bi";
 
 type SidebarProps = {
   user: User | null;
@@ -47,14 +49,20 @@ const Sidebar = ({ user }: SidebarProps) => {
           </div>
           <nav>
             <ul>
-              <li>
-                <Link to="/platnosc">Płatność</Link>
-              </li>
-              <li>
-                <Link to="/ustawienia">Ustawienia</Link>
-              </li>
+              {navLinks.map((navLink) => {
+                const Icon = navLink.icon;
+                return (
+                  <li>
+                    <Link to={navLink.link}>
+                      <Icon />
+                      {navLink.title}
+                    </Link>
+                  </li>
+                );
+              })}
               <li>
                 <button type="button" onClick={signOut}>
+                  <BiLogOutCircle />
                   Wyloguj się
                 </button>
               </li>

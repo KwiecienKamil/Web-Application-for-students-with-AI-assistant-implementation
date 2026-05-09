@@ -25,7 +25,7 @@ db.getConnection((err, connection) => {
     console.error("Nie udało się połączyć z bazą:", err.message);
     process.exit(1);
   }
-  console.log("Połączono z bazą danych (pool)");
+  console.log("Połączono z bazą danych");
   connection.release();
 });
 
