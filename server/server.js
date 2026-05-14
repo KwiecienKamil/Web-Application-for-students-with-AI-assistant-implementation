@@ -333,6 +333,43 @@ app.get("/exams", requireAuth, (req, res) => {
   );
 });
 
+app.post("/exams", requireAuth, (req, res) => {
+  const supabaseId = req.user.id;
+
+  const { subject, date, term, note } = req.body;
+
+  if (!subject || !date || !term) {
+    return res.status(400).json({
+      error: "Missing fields",
+    });
+  }
+
+  db.query(
+    `
+    INSERT INTO exams (subject, date, term, note, user_id)
+    VALUES (?, ?, ?, ?, ?)
+    `,
+    [subject, date, term, note || "", supabaseId],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "DB error" });
+      }
+
+      db.query(
+        "SELECT * FROM exams WHERE id = ?",
+        [result.insertId],
+        (err2, rows) => {
+          if (err2) {
+            return res.status(500).json({ error: "DB error" });
+          }
+
+          res.status(201).json(rows[0]);
+        },
+      );
+    },
+  );
+});
+
 app.get("/exams/:user_id", (req, res) => {
   const userId = req.params.user_id;
 
