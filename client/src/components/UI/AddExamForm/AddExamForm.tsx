@@ -44,9 +44,7 @@ const AddExamForm = ({ accessToken }: AddExamFormProps) => {
       }
 
       const newExam = await res.json();
-
       dispatch(addExam(newExam));
-
       setSubject("");
       setDate("");
       setTerm(1);
@@ -103,7 +101,6 @@ const AddExamForm = ({ accessToken }: AddExamFormProps) => {
           onChange={(e) => setNote(e.target.value)}
         />
       </div>
-
       <button type="submit" disabled={loading}>
         {loading ? "Dodawanie..." : "Dodaj egzamin"}
       </button>
