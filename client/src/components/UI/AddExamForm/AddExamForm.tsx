@@ -6,9 +6,10 @@ import { addExam } from "../../../features/exams/ExamSlice";
 
 type AddExamFormProps = {
   accessToken: string;
+  onClose: () => void;
 };
 
-const AddExamForm = ({ accessToken }: AddExamFormProps) => {
+const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const [subject, setSubject] = useState("");
@@ -49,6 +50,7 @@ const AddExamForm = ({ accessToken }: AddExamFormProps) => {
       setDate("");
       setTerm(1);
       setNote("");
+      onClose();
     } catch (error) {
       console.error(error);
     } finally {
