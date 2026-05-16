@@ -46,7 +46,7 @@ const Sidebar = ({ user }: SidebarProps) => {
               referrerPolicy="no-referrer"
             />
             <div>
-              <h1>{`Cześć, ${user ? displayOnlyFirstName : ""} !`}</h1>
+              <h1>{`Cześć${user?.name ? "," : ""} ${user?.name ? displayOnlyFirstName : ""} !`}</h1>
               <p>Konto Zwykłe</p>
             </div>
           </div>
