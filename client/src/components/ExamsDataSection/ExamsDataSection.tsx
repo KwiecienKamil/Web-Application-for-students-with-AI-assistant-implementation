@@ -1,4 +1,5 @@
 import type { ExamData } from "../../features/exams/ExamSlice";
+import ExamCard from "../UI/ExamCard/ExamCard";
 import "./exams-data-section.css";
 
 type ExamsDataSectionProps = {
@@ -18,17 +19,16 @@ const ExamsDataSection = ({ exams, onAddExam }: ExamsDataSectionProps) => {
         {exams.length === 0 ? (
           <p>Brak egzaminów</p>
         ) : (
-          <ul>
-            {exams.map((exam) => (
-              <li key={exam.id}>
-                <h4>{exam.subject}</h4>
-                <p>Data: {exam.date}</p>
-                <p>Termin: {exam.term}</p>
-
-                {exam.note && <p>Notatka: {exam.note}</p>}
-              </li>
-            ))}
-          </ul>
+          exams.map((exam) => (
+            <ExamCard
+              key={exam.id}
+              id={exam.id}
+              subject={exam.subject}
+              date={exam.date}
+              term={exam.term}
+              note={exam.note}
+            />
+          ))
         )}
       </div>
     </section>

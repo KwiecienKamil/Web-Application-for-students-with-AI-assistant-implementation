@@ -16,11 +16,11 @@ type HomeProps = {
 const Home = ({ session }: HomeProps) => {
   const dispatch = useAppDispatch();
 
-  // Pobranie informacji z global store
+  // Picking information from global store
   const user = useAppSelector((user) => user.user.user);
   const exams = useAppSelector((state) => state.exams.exams);
 
-  // Usestate do obsługi formularza dodawania egzaminu
+  // UseState for form modal functionality
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
