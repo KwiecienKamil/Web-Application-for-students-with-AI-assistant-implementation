@@ -1,0 +1,21 @@
+.exam-card-wrapper {
+  position: relative;
+  background-color: var(--accent);
+  color: var(--light);
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.exam-card-data h4 {
+  font-size: 1.2rem;
+}
+
+.exam-card-options-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--light);
+  font-size: 1.1rem;
+}

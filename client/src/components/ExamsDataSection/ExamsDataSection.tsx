@@ -10,7 +10,7 @@ type ExamsDataSectionProps = {
 const ExamsDataSection = ({ exams, onAddExam }: ExamsDataSectionProps) => {
   return (
     <section id="exams-section-wrapper">
-      <button type="button" onClick={onAddExam}>
+      <button type="button" onClick={onAddExam} id="add-exam-button">
         Dodaj egzamin
       </button>
       <div id="exams-data">
