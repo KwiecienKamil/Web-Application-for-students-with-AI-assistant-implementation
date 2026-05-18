@@ -31,6 +31,7 @@ const ExamsDataSection = ({ exams, onAddExam }: ExamsDataSectionProps) => {
           ))
         )}
       </div>
+      <button>Eksportuj egzaminy do PDF</button>
     </section>
   );
 };

@@ -10,18 +10,28 @@ type ExamCardProps = Pick<
 >;
 
 const ExamCard = ({ subject, date, term, note }: ExamCardProps) => {
+  // Change date format from YYYY/MM/DD to DD.MM.YYYY
+  const formattedDate = new Date(date).toLocaleDateString("pl-PL", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
   return (
     <div className="exam-card-wrapper">
       <button className="exam-card-options-button">
         <SlOptionsVertical />
       </button>
       <div className="exam-card-data">
+        <p>{formattedDate}</p>
+        <div className="exam-card-data-term-wrapper">
+          <p>Termin:</p>
+          <div className="exam-card-data-term">
+            <span>{term}</span>
+          </div>
+        </div>
         <h4>{subject}</h4>
-        <p>{date}</p>
-        <p>
-          Termin: <span>{term}</span>
-        </p>
-        {note && <p>Notatka: {note}</p>}
+        {note && <p>{note}</p>}
       </div>
     </div>
   );

@@ -19,3 +19,20 @@
   color: var(--light);
   font-size: 1.1rem;
 }
+.exam-card-data-term-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.exam-card-data-term {
+  height: 25px;
+  width: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--light);
+  border-radius: 100%;
+}
+.exam-card-data-term span {
+  color: var(--accent);
+}
