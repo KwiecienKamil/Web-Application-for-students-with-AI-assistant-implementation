@@ -23,7 +23,7 @@ const ExamCard = ({ subject, date, term, note }: ExamCardProps) => {
         <SlOptionsVertical />
       </button>
       <div className="exam-card-data">
-        <p>{formattedDate}</p>
+        <span className="exam-card-data-date">{formattedDate}</span>
         <div className="exam-card-data-term-wrapper">
           <p>Termin:</p>
           <div className="exam-card-data-term">
