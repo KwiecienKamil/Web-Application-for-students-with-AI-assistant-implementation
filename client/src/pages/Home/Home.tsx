@@ -5,10 +5,16 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { fetchUser } from "../../features/auth/userSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import "./home.css";
-import { fetchExams } from "../../features/exams/ExamSlice";
+import {
+  deleteExamAsync,
+  fetchExams,
+  updateExamAsync,
+  type ExamData,
+} from "../../features/exams/ExamSlice";
 import ExamsDataSection from "../../components/ExamsDataSection/ExamsDataSection";
 import AddExamForm from "../../components/UI/AddExamForm/AddExamForm";
 import ModalPortal from "../../components/UI/ModalPortal/ModalPortal";
+
 type HomeProps = {
   session: Session | null;
 };
@@ -35,10 +41,37 @@ const Home = ({ session }: HomeProps) => {
     }
   }, [session?.access_token, exams.length, dispatch]);
 
+  const handleUpdateExam = (exam: ExamData) => {
+    if (!session?.access_token) return;
+
+    dispatch(
+      updateExamAsync({
+        accessToken: session.access_token,
+        exam,
+      }),
+    );
+  };
+
+  const handleDeleteExam = (id: number) => {
+    if (!session?.access_token) return;
+
+    dispatch(
+      deleteExamAsync({
+        accessToken: session.access_token,
+        id,
+      }),
+    );
+  };
+
   return (
     <InterfaceWrapper>
       <Sidebar user={user} />
-      <ExamsDataSection exams={exams} onAddExam={() => setShowForm(true)} />
+      <ExamsDataSection
+        exams={exams}
+        onAddExam={() => setShowForm(true)}
+        onUpdateExam={handleUpdateExam}
+        onDeleteExam={handleDeleteExam}
+      />
       {showForm && (
         <ModalPortal>
           <div id="add-exam-modal-overlay" onClick={() => setShowForm(false)}>

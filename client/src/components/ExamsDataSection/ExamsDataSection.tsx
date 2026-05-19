@@ -5,9 +5,16 @@ import "./exams-data-section.css";
 type ExamsDataSectionProps = {
   exams: ExamData[];
   onAddExam: () => void;
+  onUpdateExam: (exam: ExamData) => void;
+  onDeleteExam: (id: number) => void;
 };
 
-const ExamsDataSection = ({ exams, onAddExam }: ExamsDataSectionProps) => {
+const ExamsDataSection = ({
+  exams,
+  onAddExam,
+  onUpdateExam,
+  onDeleteExam,
+}: ExamsDataSectionProps) => {
   return (
     <section id="exams-section-wrapper">
       <button type="button" onClick={onAddExam} id="add-exam-button">
@@ -27,6 +34,11 @@ const ExamsDataSection = ({ exams, onAddExam }: ExamsDataSectionProps) => {
               date={exam.date}
               term={exam.term}
               note={exam.note}
+              onEdit={(id) => {
+                const exam = exams.find((e) => e.id === id);
+                if (exam) onUpdateExam(exam);
+              }}
+              onDelete={onDeleteExam}
             />
           ))
         )}
