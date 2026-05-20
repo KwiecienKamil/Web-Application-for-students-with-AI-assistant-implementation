@@ -1,9 +1,11 @@
 .exam-card-wrapper {
+  min-height: 10rem;
   position: relative;
   background-color: var(--accent);
   color: var(--light);
   padding: 1rem;
   border-radius: 10px;
+  font-weight: 600;
 }
 
 .exam-card-data h4 {
@@ -26,7 +28,8 @@
   background: transparent;
   border: none;
   color: var(--light);
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+  cursor: pointer;
 }
 .exam-card-data-term-wrapper {
   display: flex;
@@ -45,4 +48,16 @@
 }
 .exam-card-data-term span {
   color: var(--accent);
+}
+
+.exam-card-options {
+  position: absolute;
+  top: 3rem;
+  right: 1rem;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.2rem;
 }

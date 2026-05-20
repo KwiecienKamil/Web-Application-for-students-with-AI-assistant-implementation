@@ -5,6 +5,7 @@ import "./exam-card.css";
 import { SlOptionsVertical } from "react-icons/sl";
 
 // Pick only needed types from already created ExamData
+// Pass functions for editing and deleting exams
 type ExamCardProps = Pick<
   ExamData,
   "id" | "subject" | "date" | "term" | "note" | "completed"
@@ -42,6 +43,7 @@ const ExamCard = ({
       <div className="exam-card-data">
         {open && (
           <div className="exam-card-options">
+            <button>Zaliczone</button>
             <button
               onClick={() => {
                 onEdit(id);
