@@ -1,5 +1,5 @@
 .exam-card-wrapper {
-  min-height: 10rem;
+  min-height: 12rem;
   position: relative;
   background-color: var(--accent);
   color: var(--light);
@@ -54,10 +54,14 @@
   position: absolute;
   top: 3rem;
   right: 1rem;
-  background: #fff;
+  background: var(--light);
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem;
-  border-radius: 0.2rem;
+  border-radius: 0.5rem;
+}
+
+.exam-success-button {
+  margin: 0;
 }

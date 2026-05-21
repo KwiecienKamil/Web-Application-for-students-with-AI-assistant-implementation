@@ -43,7 +43,7 @@ const ExamsDataSection = ({
           ))
         )}
       </div>
-      <button>Eksportuj egzaminy do PDF</button>
+      <button id="export-exams-button">Eksportuj egzaminy do PDF</button>
     </section>
   );
 };

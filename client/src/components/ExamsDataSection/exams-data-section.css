@@ -3,6 +3,7 @@
   background: var(--light);
   border-radius: 0.5rem;
   padding: 1rem;
+  overflow-y: scroll;
 }
 
 #exams-data {
@@ -14,4 +15,8 @@
 
 #add-exam-button {
   background-color: var(--success);
+}
+
+#export-exams-button {
+  margin-top: 1rem;
 }

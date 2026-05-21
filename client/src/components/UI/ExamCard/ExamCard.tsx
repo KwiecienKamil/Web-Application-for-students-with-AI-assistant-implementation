@@ -3,6 +3,7 @@ import type { ExamData } from "../../../features/exams/ExamSlice";
 import "./exam-card.css";
 
 import { SlOptionsVertical } from "react-icons/sl";
+import { Button } from "../../Button/Button";
 
 // Pick only needed types from already created ExamData
 // Pass functions for editing and deleting exams
@@ -43,24 +44,29 @@ const ExamCard = ({
       <div className="exam-card-data">
         {open && (
           <div className="exam-card-options">
-            <button>Zaliczone</button>
-            <button
+            <Button className="exam-success-button" size="sm">
+              Zaliczone
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => {
                 onEdit(id);
                 setOpen(false);
               }}
             >
               Edytuj
-            </button>
-
-            <button
+            </Button>
+            <Button
+              variant="delete"
+              size="sm"
               onClick={() => {
                 onDelete(id);
                 setOpen(false);
               }}
             >
               Usuń
-            </button>
+            </Button>
           </div>
         )}
         <span className="exam-card-data-date">{formattedDate}</span>
