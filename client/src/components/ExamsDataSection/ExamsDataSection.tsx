@@ -20,9 +20,8 @@ const ExamsDataSection = ({
       <button type="button" onClick={onAddExam} id="add-exam-button">
         Dodaj egzamin
       </button>
+      <h3>Twoje egzaminy:</h3>
       <div id="exams-data">
-        <h3>Twoje egzaminy:</h3>
-
         {exams.length === 0 ? (
           <p>Brak egzaminów</p>
         ) : (
