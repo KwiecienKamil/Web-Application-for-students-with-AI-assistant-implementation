@@ -5,54 +5,124 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import { fetchUser } from "../../features/auth/userSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import "./home.css";
-import { fetchExams } from "../../features/exams/ExamSlice";
+import {
+	completeExamAsync,
+	deleteExamAsync,
+	fetchExams,
+	updateExamAsync,
+	type ExamData,
+} from "../../features/exams/ExamSlice";
 import ExamsDataSection from "../../components/ExamsDataSection/ExamsDataSection";
 import AddExamForm from "../../components/UI/AddExamForm/AddExamForm";
 import ModalPortal from "../../components/UI/ModalPortal/ModalPortal";
+
 type HomeProps = {
-  session: Session | null;
+	session: Session | null;
 };
 
 const Home = ({ session }: HomeProps) => {
-  const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-  // Pobranie informacji z global store
-  const user = useAppSelector((user) => user.user.user);
-  const exams = useAppSelector((state) => state.exams.exams);
+	// Picking information from global store
+	const user = useAppSelector((user) => user.user.user);
+	const exams = useAppSelector((state) => state.exams.exams);
 
-  // Usestate do obsługi formularza dodawania egzaminu
-  const [showForm, setShowForm] = useState(false);
+	// UseState for form modal functionality
+	const [showForm, setShowForm] = useState(false);
+	const [examToEdit, setExamToEdit] = useState<ExamData | null>(null);
 
-  useEffect(() => {
-    if (session && !user) {
-      dispatch(fetchUser());
-    }
-  }, [session, user, dispatch]);
+	const handleEditExam = (exam: ExamData) => {
+		setExamToEdit(exam);
+		setShowForm(true);
+	};
 
-  useEffect(() => {
-    if (session?.access_token && exams.length === 0) {
-      dispatch(fetchExams(session.access_token));
-    }
-  }, [session?.access_token, exams.length, dispatch]);
+	const handleSaveExam = (exam: ExamData) => {
+		if (!session?.access_token) return;
 
-  return (
-    <InterfaceWrapper>
-      <Sidebar user={user} />
-      <ExamsDataSection exams={exams} onAddExam={() => setShowForm(true)} />
-      {showForm && (
-        <ModalPortal>
-          <div id="add-exam-modal-overlay" onClick={() => setShowForm(false)}>
-            <div onClick={(e) => e.stopPropagation()}>
-              <AddExamForm
-                accessToken={session?.access_token ?? ""}
-                onClose={() => setShowForm(false)}
-              />
-            </div>
-          </div>
-        </ModalPortal>
-      )}
-    </InterfaceWrapper>
-  );
+		dispatch(
+			updateExamAsync({
+				accessToken: session.access_token,
+				exam,
+			}),
+		);
+
+		setExamToEdit(null);
+		setShowForm(false);
+	};
+
+	useEffect(() => {
+		if (session && !user) {
+			dispatch(fetchUser());
+		}
+	}, [session, user, dispatch]);
+
+	useEffect(() => {
+		if (session?.access_token && exams.length === 0) {
+			dispatch(fetchExams(session.access_token));
+		}
+	}, [session?.access_token, exams.length, dispatch]);
+
+	const handleCompleteExam = (id: number, completed: boolean) => {
+		if (!session?.access_token) return;
+
+		dispatch(
+			completeExamAsync({
+				accessToken: session.access_token,
+				id,
+				completed,
+			}),
+		);
+	};
+
+	const handleDeleteExam = (id: number) => {
+		if (!session?.access_token) return;
+
+		dispatch(
+			deleteExamAsync({
+				accessToken: session.access_token,
+				id,
+			}),
+		);
+	};
+
+	return (
+		<InterfaceWrapper>
+			<Sidebar user={user} />
+			<ExamsDataSection
+				exams={exams}
+				onAddExam={() => {
+					setExamToEdit(null);
+					setShowForm(true);
+				}}
+				onUpdateExam={handleEditExam}
+				onDeleteExam={handleDeleteExam}
+				onCompleteExam={handleCompleteExam}
+			/>
+			{showForm && (
+				<ModalPortal>
+					<div
+						id="add-exam-modal-overlay"
+						onClick={() => {
+							setShowForm(false);
+							setExamToEdit(null);
+						}}
+					>
+						<div onClick={(e) => e.stopPropagation()}>
+							<AddExamForm
+								accessToken={session?.access_token ?? ""}
+								onClose={() => {
+									setShowForm(false);
+									setExamToEdit(null);
+								}}
+								initialData={examToEdit}
+								onSubmit={handleSaveExam}
+							/>
+						</div>
+					</div>
+				</ModalPortal>
+			)}
+		</InterfaceWrapper>
+	);
 };
 
 export default Home;

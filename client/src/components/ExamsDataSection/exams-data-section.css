@@ -1,13 +1,38 @@
 #exams-section-wrapper {
-	flex: 1;
-	background: var(--light);
-	border-radius: 0.5rem;
-	padding: 1rem;
+  flex: 1;
+  background: var(--light);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-y: scroll;
+}
+
+#exams-section-wrapper h3 {
+  margin-top: 1rem;
 }
 
 #exams-data {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-	margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#add-exam-button {
+  background-color: var(--success);
+}
+
+#export-exams-button {
+  margin-top: 1rem;
+}
+
+@media screen and (min-width: 600px) {
+  #exams-data {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  #exams-data {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
 }

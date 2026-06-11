@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import supabase from "../../utils/supabase";
 import "./login.css";
 import { FaGoogle } from "react-icons/fa";
-import logo from "../../assets/logo-ot.png";
+import logo from "../../assets/logo_OT_t.png";
 import { Button } from "../../components/Button/Button";
 import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
 
@@ -26,8 +26,6 @@ const Login = () => {
 
 		if (error) alert("Błąd logowania: " + error.message);
 	};
-
-	
 
 	const handleEmailLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
