@@ -37,7 +37,7 @@ const ExamCard = ({
   });
 
   return (
-    <div className="exam-card-wrapper">
+    <div className={`exam-card-wrapper ${completed ? "exam-completed" : ""}`}>
       <button
         className="exam-card-options-button"
         onClick={() => setOpen((prev) => !prev)}
