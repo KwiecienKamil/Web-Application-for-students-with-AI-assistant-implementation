@@ -2,11 +2,13 @@ import { useState, type FormEvent } from "react";
 import { useDispatch } from "react-redux";
 import "./add-exam-form.css";
 import type { AppDispatch } from "../../../store";
-import { addExam } from "../../../features/exams/ExamSlice";
+import { addExam, type ExamData } from "../../../features/exams/ExamSlice";
 
 type AddExamFormProps = {
   accessToken: string;
   onClose: () => void;
+  initialData?: ExamData | null;
+  onSubmit: (exam: ExamData) => void;
 };
 
 const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
