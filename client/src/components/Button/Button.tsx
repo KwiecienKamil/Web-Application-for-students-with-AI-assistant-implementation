@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes } from "react";
 import { forwardRef } from "react";
 import "./button.css";
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "delete";
+type ButtonVariant = "primary" | "secondary" | "feature" | "ghost" | "delete";
 type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
