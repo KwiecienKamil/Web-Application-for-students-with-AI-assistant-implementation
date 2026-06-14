@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import "./add-exam-form.css";
 import type { AppDispatch } from "../../../store";
 import { addExam, type ExamData } from "../../../features/exams/ExamSlice";
+import { Button } from "../../Button/Button";
 
 type AddExamFormProps = {
   accessToken: string;
@@ -105,9 +106,9 @@ const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
           onChange={(e) => setNote(e.target.value)}
         />
       </div>
-      <button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading}>
         {loading ? "Dodawanie..." : "Dodaj egzamin"}
-      </button>
+      </Button>
     </form>
   );
 };
