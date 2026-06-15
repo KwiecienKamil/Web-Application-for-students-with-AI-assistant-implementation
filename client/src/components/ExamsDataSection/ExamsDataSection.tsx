@@ -19,7 +19,7 @@ const ExamsDataSection = ({
   onCompleteExam,
 }: ExamsDataSectionProps) => {
   return (
-    <section id="exams-section-wrapper">
+    <section className="main-section-wrapper">
       <Button variant="primary" onClick={onAddExam} id="add-exam-button">
         Dodaj egzamin
       </Button>

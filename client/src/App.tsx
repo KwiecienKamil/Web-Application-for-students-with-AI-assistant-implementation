@@ -9,24 +9,26 @@ import type { RootState } from "./store";
 import "./index.css";
 import PaymentSuccess from "./features/billing/components/PaymentSuccess";
 import Checkout from "./pages/Checkout/Checkout";
+import Quiz from "./pages/Quiz/Quiz";
 
 function App() {
-	useSupabaseAuth();
-	const session = useSelector((state: RootState) => state.auth.session);
-	return (
-		<Routes>
-			<Route path="/" element={<Home session={session} />} />
-			<Route path="/login" element={<Login />} />
-			<Route
-				path="/register"
-				element={session ? <Navigate to="/" /> : <Register />}
-			/>
+  useSupabaseAuth();
+  const session = useSelector((state: RootState) => state.auth.session);
+  return (
+    <Routes>
+      <Route path="/" element={<Home session={session} />} />
+      <Route path="/quiz" element={<Quiz />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/register"
+        element={session ? <Navigate to="/" /> : <Register />}
+      />
 
-			<Route path="/auth/callback" element={<AuthCallback />} />
-			<Route path="/platnosc" element={<Checkout />} />
-			<Route path="/payment-success" element={<PaymentSuccess />} />
-		</Routes>
-	);
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/platnosc" element={<Checkout />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+    </Routes>
+  );
 }
 
 export default App;

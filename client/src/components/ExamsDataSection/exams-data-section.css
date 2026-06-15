@@ -1,4 +1,4 @@
-#exams-section-wrapper {
+.main-section-wrapper {
   flex: 1;
   background: var(--light);
   border-radius: 0.5rem;
@@ -6,7 +6,7 @@
   overflow-y: scroll;
 }
 
-#exams-section-wrapper h3 {
+.main-section-wrapper h3 {
   margin-top: 1rem;
 }
 
@@ -15,6 +15,9 @@
   grid-template-columns: 1fr;
   gap: 1rem;
   margin-top: 1rem;
+  overflow-y: scroll;
+  max-height: 400px;
+  padding-right: 2px;
 }
 
 #add-exam-button {
@@ -35,4 +38,21 @@
   #exams-data {
     grid-template-columns: 1fr 1fr 1fr;
   }
+}
+
+/* Smaller scroll */
+#exams-data::-webkit-scrollbar,
+.main-section-wrapper::-webkit-scrollbar {
+  width: 4px;
+}
+
+#exams-data::-webkit-scrollbar,
+.main-section-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#exams-data::-webkit-scrollbar,
+.main-section-wrapper::-webkit-scrollbar-thumb {
+  background: var(--light);
+  border-radius: 999px;
 }
