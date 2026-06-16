@@ -1,4 +1,5 @@
 import InterfaceWrapper from "../../components/InterfaceWrapper/InterfaceWrapper";
+import QuizGenerator from "../../components/QuizGenerator/QuizGenerator";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import { useAppSelector } from "../../store/hooks";
 
@@ -7,7 +8,9 @@ const Quiz = () => {
   return (
     <InterfaceWrapper>
       <Sidebar user={user} />
-      <div className="main-section-wrapper">X</div>
+      <div className="main-section-wrapper">
+        <QuizGenerator />
+      </div>
     </InterfaceWrapper>
   );
 };
