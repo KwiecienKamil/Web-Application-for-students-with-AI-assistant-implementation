@@ -603,47 +603,51 @@ app.put("/exams/:id", (req, res) => {
   });
 });
 
-app.post("/quiz-result", (req, res) => {
-  const { userId, score, total, percentage, answers } = req.body;
+app.post("/quiz-result", requireAuth, (req, res) => {
+  const supabaseId = req.user.id;
+
+  const { score, total, percentage, answers } = req.body;
 
   db.query(
-    `INSERT INTO quiz_results (user_id, score, total_questions, percentage)
-     VALUES (?, ?, ?, ?)`,
-    [userId, score, total, percentage],
+    `
+  INSERT INTO quiz_results
+  (user_id, score, total_questions, percentage)
+  VALUES (?, ?, ?, ?)
+  `,
+    [supabaseId, score, total, percentage],
     (err, result) => {
       if (err) {
-        console.error("Błąd SQL:", err);
-        return res.status(500).json({ error: "Błąd zapisu wyniku" });
+        console.error(err);
+        return res.status(500).json({ error: "DB error" });
       }
 
       const quizResultId = result.insertId;
 
-      if (!answers || answers.length === 0) {
-        return res.json({ success: true, quizResultId });
-      }
-
-      const values = answers.map((a) => [
+      const values = answers.map((answer) => [
         quizResultId,
-        a.question,
-        a.correct,
-        a.user,
-        a.isCorrect ? 1 : 0,
+        answer.question,
+        answer.correct,
+        answer.user,
+        answer.isCorrect ? 1 : 0,
       ]);
 
       db.query(
-        `INSERT INTO quiz_answers
-         (quiz_result_id, question, correct_answer, user_answer, is_correct)
-         VALUES ?`,
+        `
+      INSERT INTO quiz_answers
+      (quiz_result_id, question, correct_answer, user_answer, is_correct)
+      VALUES ?
+      `,
         [values],
         (err2) => {
           if (err2) {
-            console.error("Błąd SQL:", err2);
-            return res
-              .status(500)
-              .json({ error: "Błąd zapisu odpowiedzi quizu" });
+            console.error(err2);
+            return res.status(500).json({ error: "DB error" });
           }
 
-          return res.json({ success: true, quizResultId });
+          res.json({
+            success: true,
+            quizResultId,
+          });
         },
       );
     },
@@ -671,20 +675,30 @@ app.get("/quiz-results/:userId", (req, res) => {
   });
 });
 
-app.get("/quiz-result-details/:quizResultId", (req, res) => {
+app.get("/quiz-result-details/:quizResultId", requireAuth, (req, res) => {
   const { quizResultId } = req.params;
+  const supabaseId = req.user.id;
 
   db.query(
-    `SELECT question, correct_answer, user_answer, is_correct
-     FROM quiz_answers
-     WHERE quiz_result_id = ?`,
-    [quizResultId],
+    `
+      SELECT
+        qa.question,
+        qa.correct_answer,
+        qa.user_answer,
+        qa.is_correct
+      FROM quiz_answers qa
+      INNER JOIN quiz_results qr
+        ON qa.quiz_result_id = qr.id
+      WHERE qa.quiz_result_id = ?
+        AND qr.user_id = ?
+      `,
+    [quizResultId, supabaseId],
     (err, rows) => {
       if (err) {
         console.error("Błąd pobierania szczegółów quizu:", err);
-        return res
-          .status(500)
-          .json({ error: "Błąd pobierania szczegółów quizu" });
+        return res.status(500).json({
+          error: "Błąd pobierania szczegółów quizu",
+        });
       }
 
       return res.json(rows);
