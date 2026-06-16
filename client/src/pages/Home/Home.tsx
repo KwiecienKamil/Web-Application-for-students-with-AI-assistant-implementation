@@ -15,10 +15,7 @@ import {
 import ExamsDataSection from "../../components/ExamsDataSection/ExamsDataSection";
 import AddExamForm from "../../components/UI/AddExamForm/AddExamForm";
 import ModalPortal from "../../components/UI/ModalPortal/ModalPortal";
-
-type HomeProps = {
-  session: Session | null;
-};
+import type { HomeProps } from "../../types/HomeProps";
 
 const Home = ({ session }: HomeProps) => {
   const dispatch = useAppDispatch();
@@ -49,12 +46,6 @@ const Home = ({ session }: HomeProps) => {
     setExamToEdit(null);
     setShowForm(false);
   };
-
-  useEffect(() => {
-    if (session && !user) {
-      dispatch(fetchUser());
-    }
-  }, [session, user, dispatch]);
 
   useEffect(() => {
     if (session?.access_token && exams.length === 0) {

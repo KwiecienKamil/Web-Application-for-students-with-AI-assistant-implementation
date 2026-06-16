@@ -56,8 +56,8 @@
 }
 
 .quiz-option.correct {
-  background-color: #16a34a;
-  border-color: #16a34a;
+  background-color: var(--success);
+  border-color: var(--success);
 }
 
 .quiz-option.incorrect {

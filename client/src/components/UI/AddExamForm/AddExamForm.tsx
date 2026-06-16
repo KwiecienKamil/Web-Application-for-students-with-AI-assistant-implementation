@@ -96,7 +96,6 @@ const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
           <option value={3}>3 termin</option>
         </select>
       </div>
-
       <div className="form-group">
         <label htmlFor="note">Notatka</label>
         <textarea
