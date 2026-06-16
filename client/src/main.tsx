@@ -18,8 +18,6 @@ createRoot(document.getElementById("root")!).render(
           newestOnTop={false}
           closeOnClick={false}
           rtl={false}
-          pauseOnFocusLoss
-          pauseOnHover
           theme="light"
         />
       </Provider>
