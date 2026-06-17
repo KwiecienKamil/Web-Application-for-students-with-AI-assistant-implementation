@@ -114,67 +114,59 @@ const QuizGenerator = ({ session }: HomeProps) => {
         setOptionsMap={setOptionsMap}
       />
 
-      {questions.length > 0 && (
-        <div className="quiz-container">
-          <h3 className="quiz-title"></h3>
+      <ol className="quiz-list">
+        {questions.map((question, questionIndex) => {
+          const questionOptions = optionsMap[questionIndex] || [];
+          const selectedAnswer = selectedAnswers[questionIndex];
+          const isCorrect = results[questionIndex];
 
-          <ol className="quiz-list">
-            {questions.map((q, i) => {
-              const options = optionsMap[i] || [];
-              const selected = selectedAnswers[i];
-              const correct = results[i];
+          return (
+            <li key={questionIndex} className="quiz-item">
+              <p className="quiz-question">{question.question}</p>
 
-              return (
-                <li key={i} className="quiz-item">
-                  <p className="quiz-question">{q.question}</p>
+              <ul className="quiz-options">
+                {questionOptions.map((option) => {
+                  const isSelected = selectedAnswer === option;
+                  const isCorrectAnswer = question.answer === option;
 
-                  <ul className="quiz-options">
-                    {options.map((opt) => {
-                      const isSelected = selected === opt;
-                      const isCorrectAnswer = q.answer === opt;
+                  let optionClass = "quiz-option";
 
-                      let optionClass = "quiz-option";
+                  if (selectedAnswer !== undefined) {
+                    if (isCorrectAnswer) {
+                      optionClass += " correct";
+                    }
 
-                      if (selected !== undefined) {
-                        if (isCorrectAnswer) {
-                          optionClass += " correct";
-                        }
+                    if (isSelected && !isCorrectAnswer) {
+                      optionClass += " incorrect";
+                    }
+                  }
 
-                        if (isSelected && !isCorrectAnswer) {
-                          optionClass += " incorrect";
-                        }
-                      }
-
-                      return (
-                        <li
-                          key={`${i}-${opt}`}
-                          className={optionClass}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleAnswer(i, opt);
-                          }}
-                        >
-                          {opt}
-                        </li>
-                      );
-                    })}
-                  </ul>
-
-                  {selected !== undefined && (
-                    <p
-                      className={`quiz-result ${
-                        correct ? "success" : "failure"
-                      }`}
+                  return (
+                    <li
+                      key={`${questionIndex}-${option}`}
+                      className={optionClass}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleAnswer(questionIndex, option);
+                      }}
                     >
-                      {correct ? "Dobrze!" : "Źle!"}
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      )}
+                      {option}
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {selectedAnswer !== undefined && (
+                <p
+                  className={`quiz-result ${isCorrect ? "success" : "failure"}`}
+                >
+                  {isCorrect ? "Dobrze!" : "Źle!"}
+                </p>
+              )}
+            </li>
+          );
+        })}
+      </ol>
       {Object.keys(results).length === questions.length && questions.length ? (
         <div>
           <h3>Wyniki końcowe</h3>
