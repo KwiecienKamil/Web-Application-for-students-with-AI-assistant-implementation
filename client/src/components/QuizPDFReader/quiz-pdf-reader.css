@@ -1,0 +1,15 @@
+.quiz-component-wrapper {
+  width: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: white;
+  position: relative;
+  border-radius: 1rem;
+}
+
+.quiz-component-wrapper img {
+  max-width: 20%;
+  padding: 1rem;
+}

@@ -104,7 +104,7 @@ const QuizGenerator = ({ session }: HomeProps) => {
   };
 
   return (
-    <div>
+    <div className="flex-column">
       <QuizPDFReader
         user={user}
         setLoading={setLoading}
@@ -113,7 +113,6 @@ const QuizGenerator = ({ session }: HomeProps) => {
         setResults={setResults}
         setOptionsMap={setOptionsMap}
       />
-
       <ol className="quiz-list">
         {questions.map((question, questionIndex) => {
           const questionOptions = optionsMap[questionIndex] || [];

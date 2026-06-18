@@ -1,6 +1,8 @@
 import type { QA, QuizPDFReaderProps } from "../../types/QuizGeneratorTypes";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import "./quiz-pdf-reader.css";
+import brain from "../../assets/quiz_brain.png";
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -117,14 +119,20 @@ const QuizPDFReader = ({
     reader.readAsArrayBuffer(file);
   };
   return (
-    <div>
-      <input
-        id="file-upload"
-        type="file"
-        accept="application/pdf"
-        onChange={handlePDFUpload}
-      />
-      <label htmlFor="file-upload">Wybierz plik</label>
+    <div className="quiz-component-wrapper">
+      <img src={brain} alt="brain emoji" />
+      <div>
+        <h2>
+          Generator quizu <span>AI</span>
+        </h2>
+        <p>Ekspresowo wygeneruj quiz z pliku PDF!</p>
+        <input
+          id="file-upload"
+          type="file"
+          accept="application/pdf"
+          onChange={handlePDFUpload}
+        />
+      </div>
     </div>
   );
 };
