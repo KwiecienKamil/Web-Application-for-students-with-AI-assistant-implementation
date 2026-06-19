@@ -27,7 +27,10 @@
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	margin-bottom: 2rem;
+	margin-bottom: 1rem;
+}
+#sidebar-user-info h1 {
+	font-size: 1.5rem;
 }
 #sidebar-menu-button {
 	color: var(--light);
