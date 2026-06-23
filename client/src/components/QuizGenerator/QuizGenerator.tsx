@@ -113,6 +113,7 @@ const QuizGenerator = ({ session }: HomeProps) => {
         setResults={setResults}
         setOptionsMap={setOptionsMap}
       />
+      {loading ? <p>Generowanie quizu...</p> : null}
       <ol className="quiz-list">
         {questions.map((question, questionIndex) => {
           const questionOptions = optionsMap[questionIndex] || [];
