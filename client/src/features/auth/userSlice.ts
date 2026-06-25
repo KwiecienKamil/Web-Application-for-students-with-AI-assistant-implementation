@@ -1,15 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-export type User = {
-	id: string;
-	email: string;
-	name: string | null;
-	picture: string | null;
-	is_premium: boolean;
-	terms_accepted: boolean;
-	isBetaTester: boolean;
-	isProfilePublic: boolean;
-};
+import type { User } from "../../types/UserProps";
 
 type UserState = {
 	user: User | null;

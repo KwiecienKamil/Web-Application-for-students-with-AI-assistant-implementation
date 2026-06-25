@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import supabase from "../../utils/supabase";
-import type { User } from "../../features/auth/userSlice";
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import "./sidebar.css";
@@ -9,6 +8,7 @@ import logo from "../../assets/logo_OT_t.png";
 import { RiArrowLeftBoxFill } from "react-icons/ri";
 import { navLinks } from "../../utils/Helpers";
 import { BiLogOutCircle } from "react-icons/bi";
+import type { User } from "../../types/UserProps";
 
 type SidebarProps = {
 	user: User | null;
@@ -47,7 +47,13 @@ const Sidebar = ({ user }: SidebarProps) => {
 						/>
 						<div>
 							<h1>{`Cześć${user?.name ? "," : ""} ${user?.name ? displayOnlyFirstName : ""} !`}</h1>
-							<p>Konto Zwykłe</p>
+							{user?.isPremium ? (
+								<p>
+									Konto <span id="premium">Premium</span>
+								</p>
+							) : (
+								<p>Konto Zwykłe</p>
+							)}
 						</div>
 					</div>
 					<nav>

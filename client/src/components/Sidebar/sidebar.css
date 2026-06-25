@@ -37,6 +37,10 @@
 	gap: 1rem;
 	margin-bottom: 1rem;
 }
+
+#premium {
+	color: rgb(236, 126, 46);
+}
 #sidebar-user-info h1 {
 	font-size: 1.5rem;
 }
