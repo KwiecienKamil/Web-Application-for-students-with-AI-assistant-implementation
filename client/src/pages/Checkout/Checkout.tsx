@@ -2,7 +2,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { createPaymentIntent } from "../../features/billing/api";
-import CheckoutForm from "../../features/billing/components/CheckoutForm";
+import CheckoutForm from "../../features/billing/components/CheckoutForm/CheckoutForm";
 import { useStripe } from "../../features/billing/hooks/useStripe";
 import { useAppSelector } from "../../store/hooks";
 
