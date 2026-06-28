@@ -23,6 +23,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@types/react-router-dom": "^5.3.3",
 		"axios": "^1.13.4",
+		"canvas-confetti": "^1.9.4",
 		"clsx": "^2.1.1",
 		"jspdf": "^4.2.1",
 		"jspdf-autotable": "^5.0.8",
