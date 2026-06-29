@@ -45,6 +45,15 @@ const Home = ({ session }: HomeProps) => {
 
 		setExamToEdit(null);
 		setShowForm(false);
+		triggerConfetti();
+	};
+
+	const triggerConfetti = () => {
+		confetti({
+			particleCount: 120,
+			spread: 70,
+			origin: { y: 0.6 },
+		});
 	};
 
 	useEffect(() => {
@@ -63,6 +72,7 @@ const Home = ({ session }: HomeProps) => {
 				completed,
 			}),
 		);
+		triggerConfetti();
 	};
 
 	const handleDeleteExam = (id: number) => {
@@ -74,14 +84,6 @@ const Home = ({ session }: HomeProps) => {
 				id,
 			}),
 		);
-	};
-
-	const triggerConfetti = () => {
-		confetti({
-			particleCount: 120,
-			spread: 70,
-			origin: { y: 0.6 },
-		});
 	};
 
 	return (
