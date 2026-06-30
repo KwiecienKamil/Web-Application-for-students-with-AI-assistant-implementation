@@ -45,7 +45,6 @@ const Home = ({ session }: HomeProps) => {
 
 		setExamToEdit(null);
 		setShowForm(false);
-		triggerConfetti();
 	};
 
 	const triggerConfetti = () => {
@@ -72,7 +71,7 @@ const Home = ({ session }: HomeProps) => {
 				completed,
 			}),
 		);
-		triggerConfetti();
+		completed ? triggerConfetti() : null;
 	};
 
 	const handleDeleteExam = (id: number) => {
