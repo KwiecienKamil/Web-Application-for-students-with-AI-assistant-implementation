@@ -1,4 +1,3 @@
-import type { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import InterfaceWrapper from "../../components/InterfaceWrapper/InterfaceWrapper";
 import Sidebar from "../../components/Sidebar/Sidebar";
