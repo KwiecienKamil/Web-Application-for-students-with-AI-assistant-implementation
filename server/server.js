@@ -654,25 +654,22 @@ app.post("/quiz-result", requireAuth, (req, res) => {
 	);
 });
 
-app.get("/quiz-results/:userId", (req, res) => {
-	const { userId } = req.params;
+app.get("/quiz-results", requireAuth, (req, res) => {
+	const supabaseId = req.user.id;
 
-	const sql = `
-    SELECT id, score, total_questions, percentage, created_at AS date
-    FROM quiz_results
-    WHERE user_id = ?
-    ORDER BY created_at DESC
-    LIMIT 20
-  `;
+	db.query(
+		`SELECT qr.*
+		 FROM quiz_results qr
+		 WHERE qr.user_id = ?`,
+		[supabaseId],
+		(err, rows) => {
+			if (err) {
+				return res.status(500).json({ error: "DB error" });
+			}
 
-	db.query(sql, [userId], (err, rows) => {
-		if (err) {
-			console.error("Błąd pobierania wyników:", err);
-			return res.status(500).json({ error: "Błąd pobierania wyników" });
-		}
-
-		res.json(rows);
-	});
+			res.json(rows);
+		},
+	);
 });
 
 app.get("/quiz-result-details/:quizResultId", requireAuth, (req, res) => {
