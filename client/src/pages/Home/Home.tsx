@@ -22,6 +22,7 @@ const Home = ({ session }: HomeProps) => {
 	// Picking information from global store
 	const user = useAppSelector((user) => user.user.user);
 	const exams = useAppSelector((state) => state.exams.exams);
+	const quizes = useAppSelector((state) => state.quizes.results);
 
 	// UseState for form modal functionality
 	const [showForm, setShowForm] = useState(false);
