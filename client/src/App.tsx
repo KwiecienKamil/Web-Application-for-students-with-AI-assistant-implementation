@@ -12,35 +12,42 @@ import Quiz from "./pages/Quiz/Quiz";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { fetchUser } from "./features/auth/userSlice";
+import { fetchQuizResults } from "./features/quizes/QuizResultsSlice";
 
 function App() {
-	useSupabaseAuth();
-	const dispatch = useAppDispatch();
+  useSupabaseAuth();
+  const dispatch = useAppDispatch();
 
-	const session = useAppSelector((state: RootState) => state.auth.session);
-	const user = useAppSelector((user) => user.user.user);
+  const session = useAppSelector((state: RootState) => state.auth.session);
+  const user = useAppSelector((user) => user.user.user);
 
-	// Fetch user data when session or user is missing
-	useEffect(() => {
-		if (session && !user) {
-			dispatch(fetchUser());
-		}
-	}, [session, user, dispatch]);
+  // Fetch user data when session or user is missing
+  useEffect(() => {
+    if (session && !user) {
+      dispatch(fetchUser());
+    }
+  }, [session, user, dispatch]);
 
-	return (
-		<Routes>
-			<Route path="/" element={<Home session={session} />} />
-			<Route path="/quiz" element={<Quiz session={session} />} />
-			<Route path="/login" element={<Login />} />
-			<Route
-				path="/register"
-				element={session ? <Navigate to="/" /> : <Register />}
-			/>
-			<Route path="/auth/callback" element={<AuthCallback />} />
-			<Route path="/platnosc" element={<Checkout />} />
-			<Route path="/payment-success" element={<PaymentSuccess />} />
-		</Routes>
-	);
+  useEffect(() => {
+    if (session) {
+      dispatch(fetchQuizResults(session.access_token));
+    }
+  }, [session, dispatch]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Home session={session} />} />
+      <Route path="/quiz" element={<Quiz session={session} />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/register"
+        element={session ? <Navigate to="/" /> : <Register />}
+      />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/platnosc" element={<Checkout />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+    </Routes>
+  );
 }
 
 export default App;

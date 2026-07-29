@@ -1,16 +1,7 @@
 import clsx from "clsx";
-import type { ButtonHTMLAttributes } from "react";
 import { forwardRef } from "react";
 import "./button.css";
-
-type ButtonVariant = "primary" | "secondary" | "feature" | "ghost" | "delete";
-type ButtonSize = "sm" | "md" | "lg";
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  isLoading?: boolean;
-}
+import type { ButtonProps } from "./Button.types";
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
