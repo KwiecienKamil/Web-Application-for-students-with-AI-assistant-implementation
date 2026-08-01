@@ -7,23 +7,7 @@ import CheckoutForm from "../../features/billing/components/CheckoutForm/Checkou
 import { useStripe } from "../../features/billing/hooks/useStripe";
 import { useAppSelector } from "../../store/hooks";
 import "../Login/login.css";
-
-const stripeAppearance = {
-  theme: "stripe" as const,
-  variables: {
-    colorPrimary: "#188a18",
-    colorBackground: "#ffffff",
-    colorText: "#111827",
-    fontFamily: "Inter, sans-serif",
-    borderRadius: "8px",
-  },
-  rules: {
-    ".Input": {
-      border: "1px solid #ddd",
-      boxShadow: "none",
-    },
-  },
-};
+import { stripeAppearance } from "../../utils/Helpers";
 
 const Checkout = () => {
   const session = useAppSelector((state) => state.auth.session);
