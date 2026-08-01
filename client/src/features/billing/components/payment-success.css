@@ -1,0 +1,7 @@
+.payment-success-message {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--success);
+	text-align: center;
+}

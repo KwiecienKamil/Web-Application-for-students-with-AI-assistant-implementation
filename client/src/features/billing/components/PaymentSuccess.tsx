@@ -1,5 +1,9 @@
-import React from "react";
+import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import UserAuthWrapper from "../../../components/UserAuthWrapper/UserAuthWrapper";
+import "../../../components/Button/button.css";
+import "./CheckoutForm/checkout-form.css";
+import "./payment-success.css";
 
 interface PaymentSuccessParams {
 	payment_intent: string | null;
@@ -18,30 +22,39 @@ const useQueryParams = (): PaymentSuccessParams => {
 	};
 };
 
-const PaymentSuccess: React.FC = () => {
+const PaymentSuccess = () => {
 	const { payment_intent, redirect_status } = useQueryParams();
 	const navigate = useNavigate();
 
-	React.useEffect(() => {
+	useEffect(() => {
 		if (!payment_intent || !redirect_status) {
 			navigate("/", { replace: true });
 		}
 	}, [payment_intent, redirect_status, navigate]);
 
 	return (
-		<main style={{ padding: "2rem", textAlign: "center" }}>
-			<h1>Płatność zakończona sukcesem</h1>
+		<UserAuthWrapper>
+			<div className="checkout-form">
+				<div className="checkout-header">
+					<h2 className="checkout-title">
+						Konto <span>Premium</span> aktywne
+					</h2>
+					<p className="payment-success-message">
+						Płatność zakończona sukcesem
+					</p>
+					<p className="checkout-subtitle">
+						Dziękujemy za zakup! Możesz teraz korzystać ze wszystkich funkcji
+						Premium w aplikacji.
+					</p>
+				</div>
 
-			<p>
-				<strong>ID płatności:</strong> {payment_intent}
-			</p>
-			<p>
-				<strong>Status:</strong> {redirect_status}
-			</p>
-
-			<p>Dziękujemy za skorzystanie z naszego serwisu!</p>
-			<Link to="/">Wróć do aplikacji</Link>
-		</main>
+				<div className="checkout-form-actions">
+					<Link to="/" className="btn btn--primary btn--lg">
+						Wróć do aplikacji
+					</Link>
+				</div>
+			</div>
+		</UserAuthWrapper>
 	);
 };
 
