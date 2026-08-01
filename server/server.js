@@ -33,6 +33,55 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2022-08-01",
 });
 
+const activatePremium = async (paymentIntent) => {
+  const userId = paymentIntent.metadata?.userId;
+
+  if (!userId) {
+    throw new Error(`Brak userId w metadata płatności ${paymentIntent.id}`);
+  }
+
+  const [users] = await db
+    .promise()
+    .query("SELECT id FROM users WHERE supabase_id = ?", [userId]);
+
+  if (users.length === 0) {
+    throw new Error(`Użytkownik nie znaleziony: ${userId}`);
+  }
+
+  const [updateResult] = await db
+    .promise()
+    .query("UPDATE users SET is_premium = 1 WHERE supabase_id = ?", [userId]);
+
+  if (updateResult.affectedRows === 0) {
+    throw new Error(`Nie zaktualizowano is_premium dla użytkownika ${userId}`);
+  }
+
+  const [existingPayments] = await db
+    .promise()
+    .query("SELECT id FROM payments WHERE stripe_pi_id = ?", [
+      paymentIntent.id,
+    ]);
+
+  if (existingPayments.length === 0) {
+    try {
+      await db.promise().query(
+        `INSERT INTO payments (stripe_pi_id, user_id, amount, status)
+         VALUES (?, ?, ?, ?)`,
+        [
+          paymentIntent.id,
+          userId,
+          paymentIntent.amount,
+          paymentIntent.status || "succeeded",
+        ],
+      );
+    } catch (err) {
+      console.error("Nie udało się zapisać płatności:", err.message);
+    }
+  }
+
+  console.log(`Premium aktywowany dla użytkownika ${userId}`);
+};
+
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
@@ -47,36 +96,16 @@ app.post(
         process.env.STRIPE_WEBHOOK_SECRET,
       );
     } catch (err) {
+      console.error("Webhook signature error:", err.message);
       return res.status(400).send("Webhook error");
     }
 
     if (event.type === "payment_intent.succeeded") {
-      const paymentIntent = event.data.object;
-      const userId = paymentIntent.metadata.userId;
-
-      const [rows] = await db
-        .promise()
-        .query("SELECT id FROM payments WHERE stripe_pi_id = ?", [
-          paymentIntent.id,
-        ]);
-
-      if (rows.length === 0) {
-        await db.promise().query(
-          `INSERT INTO payments (stripe_pi_id, user_id, amount, status)
-           VALUES (?, ?, ?, ?)`,
-          [
-            paymentIntent.id,
-            userId,
-            paymentIntent.amount,
-            paymentIntent.status || "unknown",
-          ],
-        );
-
-        await db
-          .promise()
-          .query("UPDATE users SET is_premium = 1 WHERE supabase_id = ?", [
-            userId,
-          ]);
+      try {
+        await activatePremium(event.data.object);
+      } catch (err) {
+        console.error("Webhook handler error:", err.message);
+        return res.status(500).send("Webhook handler error");
       }
     }
 
@@ -231,6 +260,33 @@ const requireAuth = async (req, res, next) => {
     return res.status(500).json({ error: "Auth middleware error" });
   }
 };
+
+app.post("/confirm-payment", requireAuth, async (req, res) => {
+  const { paymentIntentId } = req.body;
+
+  if (!paymentIntentId) {
+    return res.status(400).json({ error: "Brak paymentIntentId w żądaniu" });
+  }
+
+  try {
+    const paymentIntent =
+      await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (paymentIntent.status !== "succeeded") {
+      return res.status(400).json({ error: "Płatność nie została zakończona" });
+    }
+
+    if (paymentIntent.metadata?.userId !== req.user.id) {
+      return res.status(403).json({ error: "Brak dostępu do tej płatności" });
+    }
+
+    await activatePremium(paymentIntent);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("confirm-payment error:", error.message);
+    res.status(500).json({ error: "Błąd potwierdzania płatności" });
+  }
+});
 
 app.post("/save-user", requireAuth, (req, res) => {
   const { email, name, picture, is_beta_tester } = req.body;

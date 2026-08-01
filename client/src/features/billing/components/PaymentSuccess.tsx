@@ -2,6 +2,9 @@ import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import UserAuthWrapper from "../../../components/UserAuthWrapper/UserAuthWrapper";
 import "../../../components/Button/button.css";
+import { fetchUser } from "../../auth/userSlice";
+import { confirmPayment } from "../api";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import "./CheckoutForm/checkout-form.css";
 import "./payment-success.css";
 
@@ -25,12 +28,21 @@ const useQueryParams = (): PaymentSuccessParams => {
 const PaymentSuccess = () => {
 	const { payment_intent, redirect_status } = useQueryParams();
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
+	const session = useAppSelector((state) => state.auth.session);
 
 	useEffect(() => {
-		if (!payment_intent || !redirect_status) {
+		if (!payment_intent || redirect_status !== "succeeded") {
 			navigate("/", { replace: true });
+			return;
 		}
-	}, [payment_intent, redirect_status, navigate]);
+
+		if (!session?.access_token) return;
+
+		confirmPayment(payment_intent, session.access_token)
+			.then(() => dispatch(fetchUser()))
+			.catch((err) => console.error("confirm-payment failed:", err));
+	}, [payment_intent, redirect_status, session, navigate, dispatch]);
 
 	return (
 		<UserAuthWrapper>
