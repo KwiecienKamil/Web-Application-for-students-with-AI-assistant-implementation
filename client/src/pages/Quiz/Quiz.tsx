@@ -1,6 +1,7 @@
 import InterfaceWrapper from "../../components/InterfaceWrapper/InterfaceWrapper";
 import QuizGenerator from "../../components/QuizGenerator/QuizGenerator";
 import Sidebar from "../../components/Sidebar/Sidebar";
+import "../../components/ExamsDataSection/exams-data-section.css";
 import { useAppSelector } from "../../store/hooks";
 import type { HomeProps } from "../../types/HomeProps";
 

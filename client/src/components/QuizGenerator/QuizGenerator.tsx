@@ -104,7 +104,7 @@ const QuizGenerator = ({ session }: HomeProps) => {
   };
 
   return (
-    <div className="flex-column">
+    <div className="flex-column quiz-container">
       <QuizPDFReader
         user={user}
         setLoading={setLoading}
@@ -113,74 +113,78 @@ const QuizGenerator = ({ session }: HomeProps) => {
         setResults={setResults}
         setOptionsMap={setOptionsMap}
       />
-      {loading ? <p>Generowanie quizu...</p> : null}
-      <ol className="quiz-list">
-        {questions.map((question, questionIndex) => {
-          const questionOptions = optionsMap[questionIndex] || [];
-          const selectedAnswer = selectedAnswers[questionIndex];
-          const isCorrect = results[questionIndex];
+      {loading ? <p className="quiz-loading">Generowanie quizu...</p> : null}
+      {questions.length > 0 ? (
+        <ol className="quiz-list">
+          {questions.map((question, questionIndex) => {
+            const questionOptions = optionsMap[questionIndex] || [];
+            const selectedAnswer = selectedAnswers[questionIndex];
+            const isCorrect = results[questionIndex];
 
-          return (
-            <li key={questionIndex} className="quiz-item">
-              <p className="quiz-question">{question.question}</p>
-
-              <ul className="quiz-options">
-                {questionOptions.map((option) => {
-                  const isSelected = selectedAnswer === option;
-                  const isCorrectAnswer = question.answer === option;
-
-                  let optionClass = "quiz-option";
-
-                  if (selectedAnswer !== undefined) {
-                    if (isCorrectAnswer) {
-                      optionClass += " correct";
-                    }
-
-                    if (isSelected && !isCorrectAnswer) {
-                      optionClass += " incorrect";
-                    }
-                  }
-
-                  return (
-                    <li
-                      key={`${questionIndex}-${option}`}
-                      className={optionClass}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleAnswer(questionIndex, option);
-                      }}
-                    >
-                      {option}
-                    </li>
-                  );
-                })}
-              </ul>
-
-              {selectedAnswer !== undefined && (
-                <p
-                  className={`quiz-result ${isCorrect ? "success" : "failure"}`}
-                >
-                  {isCorrect ? "Dobrze!" : "Źle!"}
+            return (
+              <li key={questionIndex} className="quiz-item">
+                <p className="quiz-question">
+                  {questionIndex + 1}. {question.question}
                 </p>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+
+                <ul className="quiz-options">
+                  {questionOptions.map((option) => {
+                    const isSelected = selectedAnswer === option;
+                    const isCorrectAnswer = question.answer === option;
+
+                    let optionClass = "quiz-option";
+
+                    if (selectedAnswer !== undefined) {
+                      if (isCorrectAnswer) {
+                        optionClass += " correct";
+                      }
+
+                      if (isSelected && !isCorrectAnswer) {
+                        optionClass += " incorrect";
+                      }
+                    }
+
+                    return (
+                      <li
+                        key={`${questionIndex}-${option}`}
+                        className={optionClass}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          handleAnswer(questionIndex, option);
+                        }}
+                      >
+                        {option}
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {selectedAnswer !== undefined && (
+                  <p
+                    className={`quiz-result ${isCorrect ? "success" : "failure"}`}
+                  >
+                    {isCorrect ? "Dobrze!" : "Źle!"}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      ) : null}
       {Object.keys(results).length === questions.length && questions.length ? (
-        <div>
-          <h3>Wyniki końcowe</h3>
-          <p>
+        <div className="quiz-summary">
+          <h3 className="quiz-summary-title">Wyniki końcowe</h3>
+          <p className="quiz-summary-score">
             Poprawne odpowiedzi: {correct} / {total} ({percentage}%)
           </p>
-          <p>
+          <p className="quiz-summary-message">
             {percentage >= 80
               ? "Ekspert!"
               : percentage >= 50
                 ? "Nieźle!"
                 : "Do poprawy"}
           </p>
-          <Button variant="primary" onClick={handleSaveQuiz}>
+          <Button variant="primary" size="lg" onClick={handleSaveQuiz}>
             Zakończ quiz
           </Button>
         </div>
