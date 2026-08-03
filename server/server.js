@@ -269,8 +269,7 @@ app.post("/confirm-payment", requireAuth, async (req, res) => {
   }
 
   try {
-    const paymentIntent =
-      await stripe.paymentIntents.retrieve(paymentIntentId);
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== "succeeded") {
       return res.status(400).json({ error: "Płatność nie została zakończona" });
@@ -758,34 +757,6 @@ app.get("/quiz-result-details/:quizResultId", requireAuth, (req, res) => {
       }
 
       return res.json(rows);
-    },
-  );
-});
-
-app.get("/me", (req, res) => {
-  const googleId = req.headers["x-google-id"];
-
-  if (!googleId) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-
-  db.query(
-    "SELECT name, email, picture, google_id, is_premium, terms_accepted FROM users WHERE google_id = ?",
-    [googleId],
-    (err, results) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-
-      if (results.length === 0) {
-        return res.status(404).json({ error: "Użytkownik nie znaleziony" });
-      }
-
-      const user = results[0];
-      user.terms_accepted = !!user.terms_accepted;
-      user.is_premium = !!user.is_premium;
-
-      res.json(user);
     },
   );
 });
