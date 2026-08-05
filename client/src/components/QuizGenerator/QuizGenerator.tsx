@@ -1,11 +1,42 @@
 import { useState } from "react";
 import QuizPDFReader from "../QuizPDFReader/QuizPDFReader";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import type { QA, QuizAnswerDetails } from "../../types/QuizGeneratorTypes";
+import {
+  fetchQuizResults,
+  type QuizResult,
+} from "../../features/quizes/QuizResultsSlice";
 import "./quiz-generator.css";
 import { toast } from "react-toastify";
 import type { HomeProps } from "../../types/HomeProps";
 import { Button } from "../Button/Button";
+import { parseQuizDate } from "../../utils/Helpers";
+
+const getQuizResultDateValue = (result: QuizResult) => {
+  const record = result as QuizResult & {
+    created_at?: string;
+    createdAt?: string;
+  };
+
+  return record.date ?? record.created_at ?? record.createdAt ?? null;
+};
+
+const formatQuizDate = (result: QuizResult) => {
+  const parsed = parseQuizDate(getQuizResultDateValue(result));
+
+  if (!parsed) return "Data niedostępna";
+
+  return parsed.toLocaleDateString("pl-PL", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+
+const getQuizResultTimestamp = (result: QuizResult) =>
+  parseQuizDate(getQuizResultDateValue(result))?.getTime() ?? 0;
 
 const QuizGenerator = ({ session }: HomeProps) => {
   const [questions, setQuestions] = useState<QA[]>([]);
@@ -24,8 +55,14 @@ const QuizGenerator = ({ session }: HomeProps) => {
   const correct = Object.values(results).filter(Boolean).length;
   const percentage = Math.round((correct / total) * 100);
 
+  const dispatch = useAppDispatch();
   const user = useAppSelector((user) => user.user.user);
+  const quizResults = useAppSelector((state) => state.quizes.results);
+  const resultsLoading = useAppSelector((state) => state.quizes.loading);
 
+  const sortedQuizResults = [...quizResults].sort(
+    (a, b) => getQuizResultTimestamp(b) - getQuizResultTimestamp(a),
+  );
   const handleAnswer = (qIndex: number, answer: string) => {
     if (selectedAnswers[qIndex] !== undefined) return;
 
@@ -70,9 +107,27 @@ const QuizGenerator = ({ session }: HomeProps) => {
       setOptionsMap({});
       setLoading(false);
       toast.success("Quiz zapisany, możesz zacząć nowy!");
+
+      if (session?.access_token) {
+        dispatch(fetchQuizResults(session.access_token));
+      }
+
+      if (response.quizResultId) {
+        fetchQuizDetails(response.quizResultId);
+      }
     } else {
       toast.error("Wystąpił problem podczas zapisu quizu, spróbuj ponownie");
     }
+  };
+
+  const handleQuizResultClick = (quizResultId: number) => {
+    if (activeQuizId === quizResultId) {
+      setActiveQuizId(null);
+      setQuizDetails(null);
+      return;
+    }
+
+    fetchQuizDetails(quizResultId);
   };
 
   const fetchQuizDetails = async (quizResultId: number) => {
@@ -188,6 +243,84 @@ const QuizGenerator = ({ session }: HomeProps) => {
             Zakończ quiz
           </Button>
         </div>
+      ) : null}
+
+      <section className="quiz-history">
+        <h3 className="quiz-summary-title">Historia wyników</h3>
+        {resultsLoading ? (
+          <p className="quiz-loading">Ładowanie wyników...</p>
+        ) : sortedQuizResults.length === 0 ? (
+          <p className="quiz-history-empty">Brak zapisanych wyników quizu.</p>
+        ) : (
+          <ul className="quiz-history-list">
+            {sortedQuizResults.map((result: QuizResult) => (
+              <li key={result.id}>
+                <button
+                  type="button"
+                  className={`quiz-history-item${activeQuizId === result.id ? " active" : ""}`}
+                  onClick={() => handleQuizResultClick(result.id)}
+                >
+                  <span className="quiz-history-date">
+                    {formatQuizDate(result)}
+                  </span>
+                  <span className="quiz-history-score">
+                    {result.score} / {result.total_questions} (
+                    {result.percentage}
+                    %)
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {detailsLoading ? (
+        <p className="quiz-loading">Ładowanie szczegółów...</p>
+      ) : null}
+
+      {quizDetails && activeQuizId && !detailsLoading ? (
+        <section className="quiz-details">
+          <h3 className="quiz-summary-title">Szczegóły quizu</h3>
+          <ol className="quiz-list">
+            {quizDetails.map((detail: QuizAnswerDetails, index) => {
+              const isCorrect = !!detail.is_correct;
+
+              return (
+                <li key={index} className="quiz-item">
+                  <p className="quiz-question">
+                    {index + 1}. {detail.question}
+                  </p>
+                  <p
+                    className={`quiz-detail-answer ${isCorrect ? "success" : "failure"}`}
+                  >
+                    Twoja odpowiedź: {detail.user_answer}
+                  </p>
+                  {!isCorrect ? (
+                    <p className="quiz-detail-answer success">
+                      Poprawna odpowiedź: {detail.correct_answer}
+                    </p>
+                  ) : null}
+                  <p
+                    className={`quiz-result ${isCorrect ? "success" : "failure"}`}
+                  >
+                    {isCorrect ? "Dobrze!" : "Źle!"}
+                  </p>
+                </li>
+              );
+            })}
+          </ol>
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => {
+              setActiveQuizId(null);
+              setQuizDetails(null);
+            }}
+          >
+            Zamknij
+          </Button>
+        </section>
       ) : null}
     </div>
   );

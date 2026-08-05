@@ -2,6 +2,24 @@ import { MdWorkspacePremium, MdQuiz, MdAddHomeWork } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { TbShieldSearch } from "react-icons/tb";
 
+export const parseQuizDate = (raw: unknown): Date | null => {
+  if (raw == null || raw === "") return null;
+
+  if (raw instanceof Date) {
+    return Number.isNaN(raw.getTime()) ? null : raw;
+  }
+
+  const value = String(raw).trim();
+  if (!value) return null;
+
+  const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(value)
+    ? value.replace(" ", "T")
+    : value;
+
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
 export const navLinks = [
   {
     id: 1,
