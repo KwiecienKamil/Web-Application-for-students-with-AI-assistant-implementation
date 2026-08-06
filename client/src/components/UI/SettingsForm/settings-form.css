@@ -1,0 +1,85 @@
+.settings-form {
+	width: 100%;
+	max-width: 26rem;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.settings-title {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: var(--accent);
+}
+
+.settings-subtitle {
+	margin: 0;
+	font-size: 0.95rem;
+	color: #4b5563;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.form-group label {
+	font-size: 1rem;
+	font-weight: 500;
+	color: var(--accent);
+}
+
+.settings-form input[type="text"],
+.settings-form input[type="email"] {
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid #ddd;
+	font-size: 1rem;
+	background: #fff;
+	color: var(--accent);
+}
+
+.settings-form input:disabled {
+	background: var(--light);
+	cursor: not-allowed;
+}
+
+.settings-checkbox-group label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+	font-weight: 500;
+}
+
+.settings-checkbox-group input[type="checkbox"] {
+	width: 1rem;
+	height: 1rem;
+	accent-color: var(--darkgreen);
+}
+
+.settings-account-info {
+	padding: 0.875rem 1rem;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #fff;
+}
+
+.settings-account-info p {
+	margin: 0;
+	font-size: 0.95rem;
+	color: var(--accent);
+}
+
+.settings-account-info span {
+	color: rgb(236, 126, 46);
+	font-weight: 600;
+}
+
+.settings-error {
+	margin: 0;
+	color: red;
+	font-size: 0.95rem;
+}

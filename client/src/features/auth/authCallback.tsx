@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { setSession } from "../../features/auth/authSlice";
+import { setUser } from "../../features/auth/userSlice";
 import { useAppDispatch } from "../../store/hooks";
 import supabase from "../../utils/supabase";
 
@@ -29,13 +30,16 @@ const AuthCallback = () => {
 					Authorization: `Bearer ${session.access_token}`,
 				},
 				body: JSON.stringify({
-					supabaseId: user.id,
 					email: user.email,
 					name:
 						user.user_metadata?.full_name || user.user_metadata?.name || null,
 					picture: user.user_metadata?.avatar_url || null,
 					is_beta_tester: false,
 				}),
+			}).then(async (res) => {
+				if (res.ok) {
+					dispatch(setUser(await res.json()));
+				}
 			});
 
 			navigate("/");

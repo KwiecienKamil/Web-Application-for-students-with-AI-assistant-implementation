@@ -9,6 +9,7 @@ import "./index.css";
 import PaymentSuccess from "./features/billing/components/PaymentSuccess";
 import Checkout from "./pages/Checkout/Checkout";
 import Quiz from "./pages/Quiz/Quiz";
+import Settings from "./pages/Settings/Settings";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { fetchUser } from "./features/auth/userSlice";
@@ -38,6 +39,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home session={session} />} />
       <Route path="/quiz" element={<Quiz session={session} />} />
+      <Route path="/ustawienia" element={<Settings session={session} />} />
       <Route path="/login" element={<Login />} />
       <Route
         path="/register"

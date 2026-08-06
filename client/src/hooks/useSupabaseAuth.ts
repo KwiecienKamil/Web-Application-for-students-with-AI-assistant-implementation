@@ -2,6 +2,7 @@ import type { Session } from "@supabase/supabase-js";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setSession } from "../features/auth/authSlice";
+import { clearUser } from "../features/auth/userSlice";
 import type { AppDispatch } from "../store";
 import supabase from "../utils/supabase";
 
@@ -24,6 +25,9 @@ export const useSupabaseAuth = () => {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange((_event, session) => {
 			dispatch(setSession(session as Session | null));
+			if (!session) {
+				dispatch(clearUser());
+			}
 		});
 
 		return () => subscription.unsubscribe();

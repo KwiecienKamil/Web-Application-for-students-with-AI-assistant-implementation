@@ -261,6 +261,53 @@ const requireAuth = async (req, res, next) => {
   }
 };
 
+const USER_SELECT_FIELDS = `
+  id,
+  name,
+  email,
+  picture,
+  supabase_id,
+  is_premium,
+  terms_accepted,
+  isBetaTester,
+  isProfilePublic
+`;
+
+const formatUserResponse = (user) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  picture: user.picture,
+  supabaseId: user.supabase_id,
+  isPremium: !!user.is_premium,
+  termsAccepted: !!user.terms_accepted,
+  isBetaTester: !!user.isBetaTester,
+  isProfilePublic: !!user.isProfilePublic,
+});
+
+const fetchUserBySupabaseId = (supabaseId, callback) => {
+  db.query(
+    `SELECT ${USER_SELECT_FIELDS} FROM users WHERE supabase_id = ?`,
+    [supabaseId],
+    callback,
+  );
+};
+
+const sendUserResponse = (supabaseId, res, statusCode = 200) => {
+  fetchUserBySupabaseId(supabaseId, (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "DB error" });
+    }
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(statusCode).json(formatUserResponse(rows[0]));
+  });
+};
+
 app.post("/confirm-payment", requireAuth, async (req, res) => {
   const { paymentIntentId } = req.body;
 
@@ -308,10 +355,13 @@ app.post("/save-user", requireAuth, (req, res) => {
       if (rows.length > 0) {
         db.query(
           `UPDATE users 
-           SET email = ?, name = ?, picture = ?, isBetaTester = ?
+           SET email = ?, picture = ?, isBetaTester = ?
            WHERE supabase_id = ?`,
-          [email, safeName, safePicture, isBetaTesterValue, supabaseId],
-          () => res.status(200).send("User updated"),
+          [email, safePicture, isBetaTesterValue, supabaseId],
+          (updateErr) => {
+            if (updateErr) return res.status(500).json({ error: "DB error" });
+            sendUserResponse(supabaseId, res);
+          },
         );
       } else {
         db.query(
@@ -319,7 +369,10 @@ app.post("/save-user", requireAuth, (req, res) => {
            (supabase_id, email, name, picture, isBetaTester)
            VALUES (?, ?, ?, ?, ?)`,
           [supabaseId, email, safeName, safePicture, isBetaTesterValue],
-          () => res.status(201).send("User created"),
+          (insertErr) => {
+            if (insertErr) return res.status(500).json({ error: "DB error" });
+            sendUserResponse(supabaseId, res, 201);
+          },
         );
       }
     },
@@ -327,46 +380,7 @@ app.post("/save-user", requireAuth, (req, res) => {
 });
 
 app.get("/getUser", requireAuth, (req, res) => {
-  const supabaseId = req.user.id;
-
-  db.query(
-    `SELECT 
-      id,
-      name,
-      email,
-      picture,
-      supabase_id,
-      is_premium,
-      terms_accepted,
-      isBetaTester,
-      isProfilePublic
-     FROM users
-     WHERE supabase_id = ?`,
-    [supabaseId],
-    (err, rows) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "DB error" });
-      }
-
-      if (rows.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
-
-      const user = rows[0];
-      res.json({
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        picture: user.picture,
-        supabaseId: user.supabase_id,
-        isPremium: !!user.is_premium,
-        termsAccepted: !!user.terms_accepted,
-        isBetaTester: !!user.isBetaTester,
-        isProfilePublic: !!user.isProfilePublic,
-      });
-    },
-  );
+  sendUserResponse(req.user.id, res);
 });
 
 app.get("/exams", requireAuth, (req, res) => {
@@ -543,16 +557,16 @@ app.delete("/delete/:googleId", (req, res) => {
   });
 });
 
-app.put("/user/settings", (req, res) => {
-  const { googleId, username, isProfilePublic } = req.body;
-  if (!googleId) return res.status(400).json({ error: "Brak googleId" });
+app.put("/user/settings", requireAuth, (req, res) => {
+  const supabaseId = req.user.id;
+  const { username, isProfilePublic } = req.body;
 
   db.query(
-    "UPDATE users SET name = ?, isProfilePublic = ? WHERE google_id = ?",
-    [username, isProfilePublic ? 1 : 0, googleId],
-    (err, results) => {
+    "UPDATE users SET name = ?, isProfilePublic = ? WHERE supabase_id = ?",
+    [username, isProfilePublic ? 1 : 0, supabaseId],
+    (err) => {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ success: true, message: "Ustawienia zapisane" });
+      sendUserResponse(supabaseId, res);
     },
   );
 });

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { Session } from "@supabase/supabase-js";
 import supabase from "../../utils/supabase";
+import { setUser, clearUser } from "./userSlice";
 
 export type AuthState = {
 	session: Session | null;
@@ -19,7 +20,7 @@ const initialState: AuthState = {
 const saveUserToBackend = async (session: Session) => {
 	const user = session.user;
 
-	await fetch(`${import.meta.env.VITE_SERVER_URL}/save-user`, {
+	const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/save-user`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
@@ -32,6 +33,12 @@ const saveUserToBackend = async (session: Session) => {
 			is_beta_tester: false,
 		}),
 	});
+
+	if (!res.ok) {
+		throw new Error("Failed to sync user");
+	}
+
+	return res.json();
 };
 
 export const loginWithEmail = createAsyncThunk(
@@ -48,14 +55,16 @@ export const loginWithEmail = createAsyncThunk(
 		if (error) return thunkAPI.rejectWithValue(error.message);
 
 		if (data.session) {
-			await saveUserToBackend(data.session);
+			const savedUser = await saveUserToBackend(data.session);
+			thunkAPI.dispatch(setUser(savedUser));
 		}
 		return data.session;
 	},
 );
 
-export const logout = createAsyncThunk("auth/logout", async () => {
+export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
 	await supabase.auth.signOut();
+	thunkAPI.dispatch(clearUser());
 	return null;
 });
 
