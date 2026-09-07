@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useDispatch } from "react-redux";
 import "./add-exam-form.css";
 import type { AppDispatch } from "../../../store";
@@ -12,8 +12,16 @@ type AddExamFormProps = {
   onSubmit: (exam: ExamData) => void;
 };
 
-const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
+const formatDateForInput = (date: string) => date.slice(0, 10);
+
+const AddExamForm = ({
+  accessToken,
+  onClose,
+  initialData,
+  onSubmit,
+}: AddExamFormProps) => {
   const dispatch = useDispatch<AppDispatch>();
+  const isEditMode = !!initialData;
 
   const [subject, setSubject] = useState("");
   const [date, setDate] = useState("");
@@ -21,10 +29,37 @@ const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (initialData) {
+      setSubject(initialData.subject);
+      setDate(formatDateForInput(initialData.date));
+      setTerm(initialData.term);
+      setNote(initialData.note ?? "");
+      return;
+    }
+
+    setSubject("");
+    setDate("");
+    setTerm(1);
+    setNote("");
+  }, [initialData]);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!subject || !date) return;
+
+    if (isEditMode && initialData) {
+      onSubmit({
+        ...initialData,
+        subject,
+        date,
+        term,
+        note,
+      });
+      onClose();
+      return;
+    }
 
     try {
       setLoading(true);
@@ -49,10 +84,6 @@ const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
 
       const newExam = await res.json();
       dispatch(addExam(newExam));
-      setSubject("");
-      setDate("");
-      setTerm(1);
-      setNote("");
       onClose();
     } catch (error) {
       console.error(error);
@@ -106,7 +137,13 @@ const AddExamForm = ({ accessToken, onClose }: AddExamFormProps) => {
         />
       </div>
       <Button type="submit" disabled={loading}>
-        {loading ? "Dodawanie..." : "Dodaj egzamin"}
+        {loading
+          ? isEditMode
+            ? "Zapisywanie..."
+            : "Dodawanie..."
+          : isEditMode
+            ? "Zapisz zmiany"
+            : "Dodaj egzamin"}
       </Button>
     </form>
   );

@@ -594,10 +594,14 @@ app.post("/accept-terms", (req, res) => {
   });
 });
 
-app.put("/exams/:id", (req, res) => {
+app.put("/exams/:id", requireAuth, (req, res) => {
   const examId = req.params.id;
+  const supabaseId = req.user.id;
 
-  db.query("SELECT * FROM exams WHERE id = ?", [examId], (err, rows) => {
+  db.query(
+    "SELECT * FROM exams WHERE id = ? AND user_id = ?",
+    [examId, supabaseId],
+    (err, rows) => {
     if (err) {
       console.error("Błąd podczas pobierania egzaminu:", err);
       return res.status(500).json({ error: "Błąd serwera" });
@@ -631,7 +635,7 @@ app.put("/exams/:id", (req, res) => {
     const queryUpdate = `
       UPDATE exams
       SET subject = ?, date = ?, term = ?, note = ?, completed = ?
-      WHERE id = ?
+      WHERE id = ? AND user_id = ?
     `;
 
     db.query(
@@ -643,6 +647,7 @@ app.put("/exams/:id", (req, res) => {
         updatedExam.note,
         updatedExam.completed,
         examId,
+        supabaseId,
       ],
       (err2, result) => {
         if (err2) {

@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
 import { setSession } from "../../features/auth/authSlice";
 import { setUser } from "../../features/auth/userSlice";
 import { useAppDispatch } from "../../store/hooks";
 import supabase from "../../utils/supabase";
+import "../../pages/Login/login.css";
+import "./authCallback.css";
 
 const AuthCallback = () => {
 	const navigate = useNavigate();
@@ -48,7 +51,17 @@ const AuthCallback = () => {
 		handleCallback();
 	}, [dispatch, navigate]);
 
-	return <p>Potwierdzanie konta...</p>;
+	return (
+		<UserAuthWrapper>
+			<div className="auth-form auth-callback">
+				<div className="auth-callback-spinner" aria-hidden="true" />
+				<h2 className="auth-callback-title">Potwierdzanie konta...</h2>
+				<p className="auth-callback-subtitle">
+					Proszę czekać, logujemy Cię do aplikacji.
+				</p>
+			</div>
+		</UserAuthWrapper>
+	);
 };
 
 export default AuthCallback;
