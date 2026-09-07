@@ -78,8 +78,6 @@ const activatePremium = async (paymentIntent) => {
       console.error("Nie udało się zapisać płatności:", err.message);
     }
   }
-
-  console.log(`Premium aktywowany dla użytkownika ${userId}`);
 };
 
 app.post(
@@ -602,79 +600,80 @@ app.put("/exams/:id", requireAuth, (req, res) => {
     "SELECT * FROM exams WHERE id = ? AND user_id = ?",
     [examId, supabaseId],
     (err, rows) => {
-    if (err) {
-      console.error("Błąd podczas pobierania egzaminu:", err);
-      return res.status(500).json({ error: "Błąd serwera" });
-    }
+      if (err) {
+        console.error("Błąd podczas pobierania egzaminu:", err);
+        return res.status(500).json({ error: "Błąd serwera" });
+      }
 
-    if (rows.length === 0) {
-      return res.status(404).json({ error: "Egzamin nie znaleziony" });
-    }
+      if (rows.length === 0) {
+        return res.status(404).json({ error: "Egzamin nie znaleziony" });
+      }
 
-    const existingExam = rows[0];
+      const existingExam = rows[0];
 
-    const updatedExam = {
-      subject: req.body.subject ?? existingExam.subject,
-      date: req.body.date ?? existingExam.date,
-      term: req.body.term ?? existingExam.term,
-      note: req.body.note ?? existingExam.note,
-      completed:
-        req.body.completed !== undefined
-          ? req.body.completed
-            ? 1
-            : 0
-          : existingExam.completed,
-    };
+      const updatedExam = {
+        subject: req.body.subject ?? existingExam.subject,
+        date: req.body.date ?? existingExam.date,
+        term: req.body.term ?? existingExam.term,
+        note: req.body.note ?? existingExam.note,
+        completed:
+          req.body.completed !== undefined
+            ? req.body.completed
+              ? 1
+              : 0
+            : existingExam.completed,
+      };
 
-    if (!updatedExam.subject || !updatedExam.date || !updatedExam.term) {
-      return res
-        .status(400)
-        .json({ error: "Brak wymaganych danych: subject, date, term" });
-    }
+      if (!updatedExam.subject || !updatedExam.date || !updatedExam.term) {
+        return res
+          .status(400)
+          .json({ error: "Brak wymaganych danych: subject, date, term" });
+      }
 
-    const queryUpdate = `
+      const queryUpdate = `
       UPDATE exams
       SET subject = ?, date = ?, term = ?, note = ?, completed = ?
       WHERE id = ? AND user_id = ?
     `;
 
-    db.query(
-      queryUpdate,
-      [
-        updatedExam.subject,
-        updatedExam.date,
-        updatedExam.term,
-        updatedExam.note,
-        updatedExam.completed,
-        examId,
-        supabaseId,
-      ],
-      (err2, result) => {
-        if (err2) {
-          console.error("Błąd podczas aktualizacji egzaminu:", err2);
-          return res
-            .status(500)
-            .json({ error: "Błąd podczas aktualizacji egzaminu" });
-        }
+      db.query(
+        queryUpdate,
+        [
+          updatedExam.subject,
+          updatedExam.date,
+          updatedExam.term,
+          updatedExam.note,
+          updatedExam.completed,
+          examId,
+          supabaseId,
+        ],
+        (err2, result) => {
+          if (err2) {
+            console.error("Błąd podczas aktualizacji egzaminu:", err2);
+            return res
+              .status(500)
+              .json({ error: "Błąd podczas aktualizacji egzaminu" });
+          }
 
-        db.query(
-          "SELECT * FROM exams WHERE id = ?",
-          [examId],
-          (err3, rows2) => {
-            if (err3) {
-              console.error(
-                "Błąd podczas pobierania egzaminu po update:",
-                err3,
-              );
-              return res.status(500).json({ error: "Błąd serwera" });
-            }
+          db.query(
+            "SELECT * FROM exams WHERE id = ?",
+            [examId],
+            (err3, rows2) => {
+              if (err3) {
+                console.error(
+                  "Błąd podczas pobierania egzaminu po update:",
+                  err3,
+                );
+                return res.status(500).json({ error: "Błąd serwera" });
+              }
 
-            res.json(rows2[0]);
-          },
-        );
-      },
-    );
-  });
+              res.json(rows2[0]);
+            },
+          );
+        },
+      );
+    },
+  );
 });
 
 app.post("/quiz-result", requireAuth, (req, res) => {
@@ -741,8 +740,6 @@ app.get("/quiz-results", requireAuth, (req, res) => {
         console.error("Database error:", err);
         return res.status(500).json({ error: "DB error" });
       }
-
-      console.log("Quiz results from database:", rows);
 
       res.json(rows);
     },

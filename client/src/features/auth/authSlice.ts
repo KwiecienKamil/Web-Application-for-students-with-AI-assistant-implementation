@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { Session } from "@supabase/supabase-js";
 import supabase from "../../utils/supabase";
+import { getAuthRedirectUrl } from "../../utils/authRedirect";
 import { setUser, clearUser } from "./userSlice";
 
 export type AuthState = {
@@ -78,7 +79,7 @@ export const registerWithEmail = createAsyncThunk(
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: getAuthRedirectUrl(),
       },
     });
 

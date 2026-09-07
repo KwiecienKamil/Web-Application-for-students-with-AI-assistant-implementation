@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginWithEmail } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import supabase from "../../utils/supabase";
+import { getAuthRedirectUrl } from "../../utils/authRedirect";
 import "./login.css";
 import { FaGoogle } from "react-icons/fa";
 import logo from "../../assets/banner.png";
@@ -20,7 +21,7 @@ const Login = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getAuthRedirectUrl(),
       },
     });
 

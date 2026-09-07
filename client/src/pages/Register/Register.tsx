@@ -7,6 +7,7 @@ import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
 import { registerWithEmail } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import supabase from "../../utils/supabase";
+import { getAuthRedirectUrl } from "../../utils/authRedirect";
 
 const Register = () => {
   const dispatch = useAppDispatch();
@@ -40,7 +41,7 @@ const Register = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: getAuthRedirectUrl(),
       },
     });
 
