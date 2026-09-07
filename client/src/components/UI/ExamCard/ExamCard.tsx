@@ -5,8 +5,6 @@ import "./exam-card.css";
 import { SlOptionsVertical } from "react-icons/sl";
 import { Button } from "../../Button/Button";
 
-// Pick only needed types from already created ExamData
-// Pass functions for editing and deleting exams
 type ExamCardProps = Pick<
   ExamData,
   "id" | "subject" | "date" | "term" | "note" | "completed"
