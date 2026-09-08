@@ -1,10 +1,9 @@
 import type { QA, QuizPDFReaderProps } from "../../types/QuizGeneratorTypes";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
-import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import "./quiz-pdf-reader.css";
 import brain from "../../assets/quiz_brain2.png";
 
-GlobalWorkerOptions.workerSrc = pdfWorker;
+GlobalWorkerOptions.workerSrc = `${import.meta.env.BASE_URL}pdf.worker.min.js`;
 
 const QuizPDFReader = ({
 	user,
