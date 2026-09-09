@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { fetchUser } from "./features/auth/userSlice";
 import { fetchQuizResults } from "./features/quizes/QuizResultsSlice";
+import { Legal } from "./pages/Legal/Legal";
 
 function App() {
   useSupabaseAuth();
@@ -40,6 +41,7 @@ function App() {
       <Route path="/" element={<Home session={session} />} />
       <Route path="/quiz" element={<Quiz session={session} />} />
       <Route path="/ustawienia" element={<Settings session={session} />} />
+      <Route path="/legal" element={<Legal />} />
       <Route path="/login" element={<Login />} />
       <Route
         path="/register"
