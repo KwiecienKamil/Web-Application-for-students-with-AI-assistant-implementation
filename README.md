@@ -1,4 +1,4 @@
-# Ogarnijto.org — Student Web Application with AI Assistant
+# Ogarnijto.org — Web appliacation for students with AI assistant implementation
 
 A full-stack web platform for students to manage exams, generate AI-powered quizzes from PDF materials, and unlock Premium features through secure payments.
 ---
