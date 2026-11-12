@@ -3,14 +3,7 @@ import { useExportPDF } from "../../hooks/useExportPDF/useExportPDF";
 import { Button } from "../Button/Button";
 import ExamCard from "../UI/ExamCard/ExamCard";
 import "./exams-data-section.css";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from "recharts";
 
 type ExamsDataSectionProps = {
   exams: ExamData[];
@@ -28,18 +21,6 @@ const ExamsDataSection = ({
   onCompleteExam,
 }: ExamsDataSectionProps) => {
   const { exportToPDF } = useExportPDF(exams);
-  const completedExams = exams.filter((exam) => exam.completed).length;
-  const incompleteExams = exams.filter((exam) => !exam.completed).length;
-  const chartData = [
-    {
-      name: "Zakończone",
-      value: completedExams,
-    },
-    {
-      name: "Niezakończone",
-      value: incompleteExams,
-    },
-  ];
 
   return (
     <section className="main-section-wrapper">
@@ -96,6 +77,7 @@ const ExamsDataSection = ({
                 <Cell fill="#1aaa1a" />
                 <Cell fill="#111827" />
               </Pie>
+              <Legend formatter={(value) => value} />
             </PieChart>
           </ResponsiveContainer>
         </div>
