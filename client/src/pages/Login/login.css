@@ -48,6 +48,35 @@
   color: red;
 }
 
+.auth-demo {
+  width: 100%;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.auth-demo-label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--purple);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.auth-demo-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #4b5563;
+  text-align: center;
+  line-height: 1.35;
+}
+
 @media screen and (min-width: 800px) {
   .auth-form {
     min-width: 600px;

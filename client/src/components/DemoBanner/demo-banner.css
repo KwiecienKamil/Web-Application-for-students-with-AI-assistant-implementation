@@ -1,0 +1,25 @@
+.demo-banner {
+	width: 100%;
+	padding: 0.65rem 1rem;
+	background: rgb(236, 126, 46);
+	color: #fff;
+	font-size: 0.9rem;
+	font-weight: 500;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem 1rem;
+	border-radius: 8px;
+	margin-bottom: 0.75rem;
+}
+
+.demo-banner a {
+	color: #fff;
+	font-weight: 600;
+	text-decoration: underline;
+}
+
+.demo-banner a:hover {
+	opacity: 0.9;
+}

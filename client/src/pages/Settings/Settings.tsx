@@ -8,6 +8,7 @@ import type { HomeProps } from "../../types/HomeProps";
 
 const Settings = ({ session }: HomeProps) => {
 	const user = useAppSelector((state) => state.user.user);
+	const isDemoMode = useAppSelector((state) => state.auth.isDemoMode);
 
 	if (!session) return <Navigate to="/login" replace />;
 
@@ -15,7 +16,11 @@ const Settings = ({ session }: HomeProps) => {
 		<InterfaceWrapper>
 			<Sidebar user={user} />
 			<div className="main-section-wrapper">
-				<SettingsForm accessToken={session.access_token} user={user} />
+				<SettingsForm
+					accessToken={session.access_token}
+					user={user}
+					isDemoMode={isDemoMode}
+				/>
 			</div>
 		</InterfaceWrapper>
 	);

@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { useAppSelector } from "../../store/hooks";
+import DemoBanner from "../DemoBanner/DemoBanner";
 import "./interface-wrapper.css";
 
 type WrapperProps = {
@@ -6,7 +8,14 @@ type WrapperProps = {
 };
 
 const InterfaceWrapper = ({ children }: WrapperProps) => {
-	return <div id="interface-wrapper">{children}</div>;
+	const isDemoMode = useAppSelector((state) => state.auth.isDemoMode);
+
+	return (
+		<div id="interface-wrapper">
+			{isDemoMode ? <DemoBanner /> : null}
+			<div className="interface-wrapper-main">{children}</div>
+		</div>
+	);
 };
 
 export default InterfaceWrapper;

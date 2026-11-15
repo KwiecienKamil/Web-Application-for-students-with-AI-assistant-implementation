@@ -10,6 +10,8 @@ type AddExamFormProps = {
   onClose: () => void;
   initialData?: ExamData | null;
   onSubmit: (exam: ExamData) => void;
+  isDemoMode?: boolean;
+  onDemoAdd?: (exam: Omit<ExamData, "id" | "user_id">) => void;
 };
 
 const formatDateForInput = (date: string) => date.slice(0, 10);
@@ -19,6 +21,8 @@ const AddExamForm = ({
   onClose,
   initialData,
   onSubmit,
+  isDemoMode = false,
+  onDemoAdd,
 }: AddExamFormProps) => {
   const dispatch = useDispatch<AppDispatch>();
   const isEditMode = !!initialData;
@@ -57,6 +61,12 @@ const AddExamForm = ({
         term,
         note,
       });
+      onClose();
+      return;
+    }
+
+    if (isDemoMode && onDemoAdd) {
+      onDemoAdd({ subject, date, term, note, completed: false });
       onClose();
       return;
     }

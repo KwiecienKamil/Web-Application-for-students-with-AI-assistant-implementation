@@ -8,6 +8,8 @@ import "./login.css";
 import { FaGoogle } from "react-icons/fa";
 import logo from "../../assets/banner.png";
 import { Button } from "../../components/Button/Button";
+import { enterDemoMode } from "../../features/demo/demoMode";
+
 import UserAuthWrapper from "../../components/UserAuthWrapper/UserAuthWrapper";
 
 const Login = () => {
@@ -31,6 +33,11 @@ const Login = () => {
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch(loginWithEmail({ email, password }));
+  };
+
+  const handleDemoAccess = async () => {
+    await dispatch(enterDemoMode());
+    navigate("/");
   };
 
   useEffect(() => {
@@ -73,6 +80,14 @@ const Login = () => {
           <Button variant="secondary" size="lg" onClick={signInWithGoogle}>
             <FaGoogle className="auth-google-icon" /> Zaloguj przez Google
           </Button>
+        </div>
+        <div className="auth-demo">
+          <Button variant="feature" size="lg" onClick={handleDemoAccess}>
+            Zobacz aplikację (demo)
+          </Button>
+          <p className="auth-demo-hint">
+            Przykładowe dane - bez logowania i zapisu w bazie.
+          </p>
         </div>
         <div>
           Nie masz konta? <Link to="/register">Zarejestruj się</Link>

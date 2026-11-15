@@ -1,5 +1,4 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import supabase from "../../utils/supabase";
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import "./sidebar.css";
@@ -9,17 +8,20 @@ import { RiArrowLeftBoxFill } from "react-icons/ri";
 import { navLinks } from "../../utils/Helpers";
 import { BiLogOutCircle } from "react-icons/bi";
 import type { User } from "../../types/UserProps";
+import { useAppDispatch } from "../../store/hooks";
+import { logout } from "../../features/auth/authSlice";
 
 type SidebarProps = {
   user: User | null;
 };
 
 const Sidebar = ({ user }: SidebarProps) => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await dispatch(logout());
     navigate("/login");
   };
 

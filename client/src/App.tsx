@@ -21,20 +21,21 @@ function App() {
   const dispatch = useAppDispatch();
 
   const session = useAppSelector((state: RootState) => state.auth.session);
+  const isDemoMode = useAppSelector((state: RootState) => state.auth.isDemoMode);
   const user = useAppSelector((user) => user.user.user);
 
   // Fetch user data when session or user is missing
   useEffect(() => {
-    if (session && !user) {
+    if (session && !user && !isDemoMode) {
       dispatch(fetchUser());
     }
-  }, [session, user, dispatch]);
+  }, [session, user, isDemoMode, dispatch]);
 
   useEffect(() => {
-    if (session) {
+    if (session && !isDemoMode) {
       dispatch(fetchQuizResults(session.access_token));
     }
-  }, [session, dispatch]);
+  }, [session, isDemoMode, dispatch]);
 
   return (
     <Routes>

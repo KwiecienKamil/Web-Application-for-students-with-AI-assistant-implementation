@@ -5,9 +5,12 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import confetti from "canvas-confetti";
 import "./home.css";
 import {
+  addExam,
   completeExamAsync,
   deleteExamAsync,
   fetchExams,
+  removeExam,
+  updateExam,
   updateExamAsync,
   type ExamData,
 } from "../../features/exams/ExamSlice";
@@ -22,6 +25,7 @@ const Home = ({ session }: HomeProps) => {
   // Picking information from global store
   const user = useAppSelector((user) => user.user.user);
   const exams = useAppSelector((state) => state.exams.exams);
+  const isDemoMode = useAppSelector((state) => state.auth.isDemoMode);
 
   // UseState for form modal functionality
   const [showForm, setShowForm] = useState(false);
@@ -33,6 +37,13 @@ const Home = ({ session }: HomeProps) => {
   };
 
   const handleSaveExam = (exam: ExamData) => {
+    if (isDemoMode) {
+      dispatch(updateExam(exam));
+      setExamToEdit(null);
+      setShowForm(false);
+      return;
+    }
+
     if (!session?.access_token) return;
 
     dispatch(
@@ -55,12 +66,20 @@ const Home = ({ session }: HomeProps) => {
   };
 
   useEffect(() => {
-    if (session?.access_token && exams.length === 0) {
-      dispatch(fetchExams(session.access_token));
-    }
-  }, [session?.access_token, exams.length, dispatch]);
+    if (isDemoMode || !session?.access_token || exams.length > 0) return;
+    dispatch(fetchExams(session.access_token));
+  }, [session?.access_token, exams.length, dispatch, isDemoMode]);
 
   const handleCompleteExam = (id: number, completed: boolean) => {
+    if (isDemoMode) {
+      const exam = exams.find((item) => item.id === id);
+      if (exam) {
+        dispatch(updateExam({ ...exam, completed }));
+      }
+      if (completed) triggerConfetti();
+      return;
+    }
+
     if (!session?.access_token) return;
 
     dispatch(
@@ -74,6 +93,11 @@ const Home = ({ session }: HomeProps) => {
   };
 
   const handleDeleteExam = (id: number) => {
+    if (isDemoMode) {
+      dispatch(removeExam(id));
+      return;
+    }
+
     if (!session?.access_token) return;
 
     dispatch(
@@ -109,6 +133,16 @@ const Home = ({ session }: HomeProps) => {
             <div onClick={(e) => e.stopPropagation()}>
               <AddExamForm
                 accessToken={session?.access_token ?? ""}
+                isDemoMode={isDemoMode}
+                onDemoAdd={(exam) => {
+                  dispatch(
+                    addExam({
+                      ...exam,
+                      id: Date.now(),
+                      user_id: 0,
+                    }),
+                  );
+                }}
                 onClose={() => {
                   setShowForm(false);
                   setExamToEdit(null);

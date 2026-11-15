@@ -6,6 +6,7 @@ import {
   fetchQuizResults,
   type QuizResult,
 } from "../../features/quizes/QuizResultsSlice";
+import { demoQuizDetailsById } from "../../features/demo/demoData";
 import "./quiz-generator.css";
 import { toast } from "react-toastify";
 import type { HomeProps } from "../../types/HomeProps";
@@ -59,6 +60,7 @@ const QuizGenerator = ({ session }: HomeProps) => {
   const user = useAppSelector((user) => user.user.user);
   const quizResults = useAppSelector((state) => state.quizes.results);
   const resultsLoading = useAppSelector((state) => state.quizes.loading);
+  const isDemoMode = useAppSelector((state) => state.auth.isDemoMode);
 
   const sortedQuizResults = [...quizResults].sort(
     (a, b) => getQuizResultTimestamp(b) - getQuizResultTimestamp(a),
@@ -99,6 +101,15 @@ const QuizGenerator = ({ session }: HomeProps) => {
   }
 
   const handleSaveQuiz = async () => {
+    if (isDemoMode) {
+      setQuestions([]);
+      setSelectedAnswers({});
+      setResults({});
+      setOptionsMap({});
+      toast.info("W trybie demo wyniki quizu nie są zapisywane w bazie.");
+      return;
+    }
+
     const response = await saveQuizResult();
     if (response.success) {
       setQuestions([]);
@@ -134,6 +145,11 @@ const QuizGenerator = ({ session }: HomeProps) => {
     try {
       setDetailsLoading(true);
       setActiveQuizId(quizResultId);
+
+      if (isDemoMode) {
+        setQuizDetails(demoQuizDetailsById[quizResultId] ?? []);
+        return;
+      }
 
       const res = await fetch(
         `${import.meta.env.VITE_SERVER_URL}/quiz-result-details/${quizResultId}`,

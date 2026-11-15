@@ -3,9 +3,11 @@ import type { Session } from "@supabase/supabase-js";
 import supabase from "../../utils/supabase";
 import { getAuthRedirectUrl } from "../../utils/authRedirect";
 import { setUser, clearUser } from "./userSlice";
+import { enterDemoMode, exitDemoMode } from "../demo/demoMode";
 
 export type AuthState = {
   session: Session | null;
+  isDemoMode: boolean;
   loading: boolean;
   error: string | null;
   registrationSuccess: boolean;
@@ -13,6 +15,7 @@ export type AuthState = {
 
 const initialState: AuthState = {
   session: null,
+  isDemoMode: false,
   loading: false,
   error: null,
   registrationSuccess: false,
@@ -64,6 +67,13 @@ export const loginWithEmail = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
+  const isDemo = (thunkAPI.getState() as { auth: AuthState }).auth.isDemoMode;
+
+  if (isDemo) {
+    await thunkAPI.dispatch(exitDemoMode());
+    return null;
+  }
+
   await supabase.auth.signOut();
   thunkAPI.dispatch(clearUser());
   return null;
@@ -128,6 +138,15 @@ const authSlice = createSlice({
       })
       .addCase(logout.fulfilled, (state) => {
         state.session = null;
+      })
+      .addCase(enterDemoMode.fulfilled, (state, action) => {
+        state.session = action.payload;
+        state.isDemoMode = true;
+        state.error = null;
+      })
+      .addCase(exitDemoMode.fulfilled, (state) => {
+        state.session = null;
+        state.isDemoMode = false;
       });
   },
 });

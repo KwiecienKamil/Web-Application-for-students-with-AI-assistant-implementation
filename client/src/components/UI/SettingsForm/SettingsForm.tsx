@@ -10,9 +10,14 @@ import "./settings-form.css";
 type SettingsFormProps = {
 	accessToken: string;
 	user: User | null;
+	isDemoMode?: boolean;
 };
 
-const SettingsForm = ({ accessToken, user }: SettingsFormProps) => {
+const SettingsForm = ({
+	accessToken,
+	user,
+	isDemoMode = false,
+}: SettingsFormProps) => {
 	const dispatch = useAppDispatch();
 	const [name, setName] = useState("");
 	const [isProfilePublic, setIsProfilePublic] = useState(false);
@@ -28,6 +33,12 @@ const SettingsForm = ({ accessToken, user }: SettingsFormProps) => {
 
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+
+		if (isDemoMode) {
+			toast.info("W trybie demo ustawienia nie są zapisywane.");
+			return;
+		}
+
 		setError(null);
 		setLoading(true);
 
