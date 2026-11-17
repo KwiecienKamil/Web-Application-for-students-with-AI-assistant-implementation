@@ -77,6 +77,10 @@
   line-height: 1.35;
 }
 
+.auth-nav-function {
+  margin-top: 1rem;
+}
+
 @media screen and (min-width: 800px) {
   .auth-form {
     min-width: 600px;

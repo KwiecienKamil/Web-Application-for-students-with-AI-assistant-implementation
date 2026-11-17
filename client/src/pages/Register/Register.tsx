@@ -82,7 +82,7 @@ const Register = () => {
             <FaGoogle className="auth-google-icon" /> Zaloguj przez Google
           </Button>
         </div>
-        <div>
+        <div className="auth-nav-function">
           Masz już konto? <Link to="/login">Zaloguj się</Link>
         </div>
         {error && <p style={{ color: "red" }}>{error}</p>}
