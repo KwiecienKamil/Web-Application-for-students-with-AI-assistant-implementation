@@ -15,13 +15,16 @@ import { useAppDispatch, useAppSelector } from "./store/hooks";
 import { fetchUser } from "./features/auth/userSlice";
 import { fetchQuizResults } from "./features/quizes/QuizResultsSlice";
 import { Legal } from "./pages/Legal/Legal";
+import ChatBotAI from "./components/ChatBotAI/ChatBotAI";
 
 function App() {
   useSupabaseAuth();
   const dispatch = useAppDispatch();
 
   const session = useAppSelector((state: RootState) => state.auth.session);
-  const isDemoMode = useAppSelector((state: RootState) => state.auth.isDemoMode);
+  const isDemoMode = useAppSelector(
+    (state: RootState) => state.auth.isDemoMode,
+  );
   const user = useAppSelector((user) => user.user.user);
 
   // Fetch user data when session or user is missing
@@ -38,20 +41,23 @@ function App() {
   }, [session, isDemoMode, dispatch]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home session={session} />} />
-      <Route path="/quiz" element={<Quiz session={session} />} />
-      <Route path="/ustawienia" element={<Settings session={session} />} />
-      <Route path="/legal" element={<Legal />} />
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/register"
-        element={session ? <Navigate to="/" /> : <Register />}
-      />
-      <Route path="/auth/callback" element={<AuthCallback />} />
-      <Route path="/platnosc" element={<Checkout />} />
-      <Route path="/payment-success" element={<PaymentSuccess />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<Home session={session} />} />
+        <Route path="/quiz" element={<Quiz session={session} />} />
+        <Route path="/ustawienia" element={<Settings session={session} />} />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/register"
+          element={session ? <Navigate to="/" /> : <Register />}
+        />
+        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/platnosc" element={<Checkout />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+      </Routes>
+      <ChatBotAI />
+    </>
   );
 }
 
