@@ -18,11 +18,19 @@
   color: var(--light);
 }
 
+.chatbot-nav-btn {
+  cursor: pointer;
+}
+
 .chatbot-header-info {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
+}
+
+.chatbot-close-btn {
+  cursor: pointer;
 }
 
 .chatbot-chat-area {
@@ -41,9 +49,32 @@
 
 .chatbot-input-area-button {
   background-color: purple;
-  padding: 0 0.5rem;
+  padding: 0 1rem;
   color: white;
   height: 90%;
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#chatbot-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+.chatbot-input-area-button:hover {
+  filter: brightness(90%);
+}
+
+#chatbot-icon {
+  position: fixed;
+  right: 4rem;
+  bottom: 8rem;
+  width: 60px;
+  height: 60px;
+  background: var(--accent);
+  color: white;
+  border: 1px solid black;
+  border-radius: 100%;
+  cursor: pointer;
 }
