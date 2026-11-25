@@ -56,7 +56,7 @@ function App() {
         <Route path="/platnosc" element={<Checkout />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
-      <ChatBotAI />
+      <ChatBotAI session={session} />
     </>
   );
 }

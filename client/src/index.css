@@ -37,3 +37,9 @@
   align-items: center;
   justify-content: center;
 }
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
